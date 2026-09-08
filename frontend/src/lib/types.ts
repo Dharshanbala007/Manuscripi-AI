@@ -120,6 +120,7 @@ export interface AnalysisOut {
   issues: IssueOut[];
   error: string | null;
   profile_id: string | null;
+  page_count: number | null;
   health: HealthScoreOut | null;
   change_log: ChangeLogOut | null;
   preservation: PreservationOut | null;
@@ -203,4 +204,51 @@ export interface ApiErrorBody {
   detail?: unknown;
   hint?: string;
   error_id?: string;
+}
+
+export interface HistoryEntry {
+  id: string;
+  filename: string;
+  size: number;
+  created_at: string;
+  updated_at: string;
+  state: string;
+  profile_id: string | null;
+  health_total: number | null;
+  preservation_passed: boolean | null;
+  words: number;
+  paragraphs: number;
+  headings: number;
+  tables: number;
+  figures: number;
+  references: number;
+  sections: number;
+  session_active: boolean;
+}
+
+export interface MetaSummary {
+  title: string;
+  authors: string[];
+  abstract_present: boolean;
+  keywords: string[];
+}
+
+export interface ComparisonSide {
+  stats: StatsOut;
+  metadata: MetaSummary;
+  sections: string[];
+}
+
+export interface CompareSummary {
+  formatting_changes: number;
+  content_changes: number;
+  warnings_remaining: number;
+  preservation_passed: boolean;
+}
+
+export interface ComparisonOut {
+  original: ComparisonSide;
+  formatted: ComparisonSide;
+  deltas: Record<string, number>;
+  summary: CompareSummary;
 }

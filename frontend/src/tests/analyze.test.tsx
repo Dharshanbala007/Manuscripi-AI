@@ -27,6 +27,7 @@ function analysis(partial: Partial<AnalysisOut>): AnalysisOut {
     issues: [],
     error: null,
     profile_id: null,
+    page_count: null,
     health: null,
     change_log: null,
     preservation: null,

@@ -1,11 +1,13 @@
 import type {
   AnalysisOut,
   ApiErrorBody,
+  ComparisonOut,
   DocumentOut,
   ElementOut,
   ElementPage,
   FormatOut,
   HealthResponse,
+  HistoryEntry,
   MetadataIn,
   MetadataOut,
   OutlineOut,
@@ -89,9 +91,15 @@ export const api = {
     request<FormatOut>(`/api/documents/${id}/format`, json({ profile_id: profileId })),
   validate: (id: string) =>
     request<ValidateOut>(`/api/documents/${id}/validate`, { method: "POST" }),
+  getComparison: (id: string) =>
+    request<ComparisonOut>(`/api/documents/${id}/comparison`),
 
   deleteDocument: (id: string) =>
     request<void>(`/api/documents/${id}`, { method: "DELETE" }),
+
+  history: (limit = 20) => request<HistoryEntry[]>(`/api/history?limit=${limit}`),
+  deleteHistory: (id: string) =>
+    request<void>(`/api/history/${id}`, { method: "DELETE" }),
 
   previewUrl: (id: string) => `${API_BASE}/api/documents/${id}/preview`,
   exportDocxUrl: (id: string) => `${API_BASE}/api/documents/${id}/export/docx`,

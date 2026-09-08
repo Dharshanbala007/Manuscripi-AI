@@ -65,4 +65,24 @@ describe("api client", () => {
     expect(api.previewUrl("d1")).toBe("http://localhost:8000/api/documents/d1/preview");
     expect(api.exportPdfUrl("d1")).toBe("http://localhost:8000/api/documents/d1/export/pdf");
   });
+
+  it("builds history and comparison URLs", async () => {
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue(okJson([]));
+    await api.history(8);
+    expect((fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe(
+      "http://localhost:8000/api/history?limit=8",
+    );
+
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(new Response(null, { status: 204 }));
+    await api.deleteHistory("d1");
+    const del = (fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1);
+    expect(del?.[0]).toBe("http://localhost:8000/api/history/d1");
+    expect(del?.[1].method).toBe("DELETE");
+
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(okJson({}));
+    await api.getComparison("d1").catch(() => undefined);
+    expect((fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)?.[0]).toBe(
+      "http://localhost:8000/api/documents/d1/comparison",
+    );
+  });
 });
