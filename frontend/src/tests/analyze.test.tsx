@@ -24,8 +24,12 @@ function analysis(partial: Partial<AnalysisOut>): AnalysisOut {
     stats: null,
     metadata: null,
     parse_warnings: [],
-    issues_preview: [],
+    issues: [],
     error: null,
+    profile_id: null,
+    health: null,
+    change_log: null,
+    preservation: null,
     ...partial,
   };
 }

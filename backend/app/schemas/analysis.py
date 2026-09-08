@@ -4,8 +4,9 @@ from pydantic import BaseModel
 
 from app.domain.elements import SectionNode
 from app.domain.manuscript import DocumentStats
+from app.schemas.formatting import ChangeLogOut
 from app.schemas.metadata import MetadataOut
-from app.schemas.validation import IssueOut
+from app.schemas.validation import HealthScoreOut, IssueOut, PreservationOut
 from app.storage.base import DocumentRecord
 
 
@@ -44,8 +45,12 @@ class AnalysisOut(BaseModel):
     stats: StatsOut | None = None
     metadata: MetadataOut | None = None
     parse_warnings: list[str] = []
-    issues_preview: list[IssueOut] = []
+    issues: list[IssueOut] = []
     error: str | None = None
+    profile_id: str | None = None
+    health: HealthScoreOut | None = None
+    change_log: ChangeLogOut | None = None
+    preservation: PreservationOut | None = None
 
     @classmethod
     def from_record(cls, record: DocumentRecord) -> AnalysisOut:
@@ -65,8 +70,14 @@ class AnalysisOut(BaseModel):
             stats=StatsOut.from_domain(ms.stats) if ms else None,
             metadata=MetadataOut.from_domain(ms.metadata) if ms else None,
             parse_warnings=list(ms.parse_warnings) if ms else [],
-            issues_preview=[IssueOut.from_domain(i) for i in record.issues],
+            issues=[IssueOut.from_domain(i) for i in record.issues],
             error=record.error,
+            profile_id=record.profile_id,
+            health=HealthScoreOut.from_domain(record.health) if record.health else None,
+            change_log=ChangeLogOut.from_domain(record.change_log) if record.change_log else None,
+            preservation=(
+                PreservationOut.from_domain(record.preservation) if record.preservation else None
+            ),
         )
 
 

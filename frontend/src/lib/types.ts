@@ -117,8 +117,12 @@ export interface AnalysisOut {
   stats: StatsOut | null;
   metadata: MetadataOut | null;
   parse_warnings: string[];
-  issues_preview: IssueOut[];
+  issues: IssueOut[];
   error: string | null;
+  profile_id: string | null;
+  health: HealthScoreOut | null;
+  change_log: ChangeLogOut | null;
+  preservation: PreservationOut | null;
 }
 
 export interface ElementOut {
