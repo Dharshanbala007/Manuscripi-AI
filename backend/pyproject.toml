@@ -1,0 +1,19 @@
+[project]
+name = "manuscript-ai-backend"
+version = "0.1.0"
+description = "ManuScript AI — local rule-based academic manuscript formatting API"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008"]  # FastAPI Depends() in defaults is idiomatic
