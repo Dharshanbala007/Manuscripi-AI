@@ -18,13 +18,19 @@ from app.extraction.metadata import extract_metadata
 from app.logging_config import log_stage, logger
 from app.parsing.docx_reader import DocxReadError, parse_docx
 from app.storage.base import DocumentStore
+from app.storage.history import HistoryEntry, HistoryStore
 from app.utils.ids import short_id
 from app.utils.text import count_words, shorten
 
 _HEADING_KINDS = (ElementType.HEADING, ElementType.SUBHEADING)
 
 
-def run_analysis(doc_id: str, store: DocumentStore, confidence_threshold: float = 0.6) -> None:
+def run_analysis(
+    doc_id: str,
+    store: DocumentStore,
+    history: HistoryStore,
+    confidence_threshold: float = 0.6,
+) -> None:
     record = store.get(doc_id)
     if record is None:
         return
@@ -54,6 +60,7 @@ def run_analysis(doc_id: str, store: DocumentStore, confidence_threshold: float 
         )
     finally:
         store.update(record)
+        history.upsert(HistoryEntry.from_record(record))
         log_stage(
             "analyze_done",
             document_id=doc_id,

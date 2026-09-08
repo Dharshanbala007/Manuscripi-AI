@@ -11,6 +11,7 @@ from app.api import routes_documents, routes_formats, routes_health
 from app.api.errors import install_exception_handlers
 from app.config import get_settings
 from app.logging_config import configure_logging, log_stage
+from app.storage.history import InMemoryHistoryStore, SqliteHistoryStore
 from app.storage.memory import InMemoryDocumentStore
 from app.storage.workspace import WorkspaceManager
 
@@ -36,6 +37,11 @@ def create_app() -> FastAPI:
     app.state.settings = settings
     app.state.store = InMemoryDocumentStore()
     app.state.workspaces = WorkspaceManager(settings.work_dir)
+    app.state.history = (
+        SqliteHistoryStore(settings.history_db)
+        if settings.history_enabled
+        else InMemoryHistoryStore()
+    )
 
     app.add_middleware(
         CORSMiddleware,

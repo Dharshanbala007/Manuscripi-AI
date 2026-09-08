@@ -46,6 +46,7 @@ class DocumentRecord:
     health: HealthScore | None = None
     preservation: PreservationResult | None = None
     profile_id: str | None = None
+    page_count: int | None = None
     error: str | None = None
     error_id: str | None = None
 

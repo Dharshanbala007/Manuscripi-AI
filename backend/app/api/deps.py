@@ -6,6 +6,7 @@ from fastapi import Request
 
 from app.config import Settings
 from app.storage.base import DocumentStore
+from app.storage.history import HistoryStore
 from app.storage.workspace import WorkspaceManager
 
 
@@ -19,3 +20,7 @@ def get_store(request: Request) -> DocumentStore:
 
 def get_workspaces(request: Request) -> WorkspaceManager:
     return request.app.state.workspaces
+
+
+def get_history(request: Request) -> HistoryStore:
+    return request.app.state.history

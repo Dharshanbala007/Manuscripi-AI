@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 
 from app.analysis.corrections import apply_element, apply_metadata
 from app.analysis.pipeline import run_analysis
-from app.api.deps import get_settings_dep, get_store, get_workspaces
+from app.api.deps import get_history, get_settings_dep, get_store, get_workspaces
 from app.api.errors import ApiError
 from app.config import Settings
 from app.domain.analysis import AnalysisProgress
@@ -38,8 +38,14 @@ from app.schemas.formatting import (
 from app.schemas.metadata import MetadataIn, MetadataOut
 from app.schemas.validation import HealthScoreOut, IssueOut, PreservationOut
 from app.storage.base import DocumentRecord, DocumentStore
+from app.storage.history import HistoryEntry, HistoryStore
 from app.storage.workspace import WorkspaceManager
 from app.utils.text import shorten
+
+
+def _record_history(history: HistoryStore, record: DocumentRecord) -> None:
+    history.upsert(HistoryEntry.from_record(record))
+
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -68,11 +74,13 @@ async def upload_document(
     settings: Settings = Depends(get_settings_dep),
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
+    history: HistoryStore = Depends(get_history),
 ) -> DocumentOut:
     try:
         record = await receive_upload(file, settings, store, workspaces)
     except UploadValidationError as exc:
         raise ApiError(_STATUS_BY_CODE.get(exc.code, 400), exc.code, exc.message) from None
+    _record_history(history, record)
     return DocumentOut.from_record(record)
 
 
@@ -87,6 +95,7 @@ def analyze_document(
     background: BackgroundTasks,
     settings: Settings = Depends(get_settings_dep),
     store: DocumentStore = Depends(get_store),
+    history: HistoryStore = Depends(get_history),
 ) -> dict:
     record = _require(store, doc_id)
     if record.state in _BUSY_STATES:
@@ -97,7 +106,7 @@ def analyze_document(
     record.manuscript = None
     record.issues = []
     store.update(record)
-    background.add_task(run_analysis, doc_id, store, settings.confidence_threshold)
+    background.add_task(run_analysis, doc_id, store, history, settings.confidence_threshold)
     return {"id": doc_id, "state": "analyzing"}
 
 
@@ -184,6 +193,7 @@ def format_document_endpoint(
     body: FormatIn,
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
+    history: HistoryStore = Depends(get_history),
 ) -> FormatOut:
     record = _require_analyzed(store, doc_id)
     if record.state not in ("analyzed", "formatted", "validated"):
@@ -200,6 +210,7 @@ def format_document_endpoint(
         raise ApiError(422, "profile_unavailable", message) from None
 
     store.update(record)
+    _record_history(history, record)
     return FormatOut(
         state=record.state,
         profile_id=body.profile_id,
@@ -215,6 +226,7 @@ def validate_document_endpoint(
     doc_id: str,
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
+    history: HistoryStore = Depends(get_history),
 ) -> ValidateOut:
     record = _require_analyzed(store, doc_id)
     if record.state not in ("formatted", "validated"):
@@ -222,6 +234,7 @@ def validate_document_endpoint(
 
     issues, health, preservation = run_validate(record, workspaces)
     store.update(record)
+    _record_history(history, record)
     return ValidateOut(
         state=record.state,
         issues=[IssueOut.from_domain(i) for i in issues],
@@ -249,6 +262,7 @@ def export_document_docx(
     doc_id: str,
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
+    history: HistoryStore = Depends(get_history),
 ) -> FileResponse:
     record = _require_formatted(store, doc_id)
     out = workspaces.path(record.id, _export_basename(record, "docx"))
@@ -260,6 +274,7 @@ def export_document_docx(
     record.artifacts["export_docx"] = out
     record.state = "exported"
     store.update(record)
+    _record_history(history, record)
     return FileResponse(str(out), media_type=_DOCX_MEDIA, filename=out.name)
 
 
@@ -269,6 +284,7 @@ def export_document_pdf(
     settings: Settings = Depends(get_settings_dep),
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
+    history: HistoryStore = Depends(get_history),
 ) -> FileResponse:
     record = _require_formatted(store, doc_id)
     if not pdf_available(settings):
@@ -278,18 +294,20 @@ def export_document_pdf(
             "PDF export is unavailable on this machine. Install LibreOffice to enable it.",
         )
     try:
-        generated = export_pdf(record.artifacts["formatted"], workspaces.path(record.id), settings)
+        result = export_pdf(record.artifacts["formatted"], workspaces.path(record.id), settings)
     except PdfExportError as exc:
         if exc.unavailable:
             raise ApiError(503, "pdf_unavailable", exc.message) from None
         raise ApiError(500, "export_failed", "The PDF could not be generated.") from None
 
     target = workspaces.path(record.id, _export_basename(record, "pdf"))
-    if Path(generated) != target:
-        shutil.copyfile(generated, target)
+    if Path(result.path) != target:
+        shutil.copyfile(result.path, target)
     record.artifacts["export_pdf"] = target
+    record.page_count = result.page_count
     record.state = "exported"
     store.update(record)
+    _record_history(history, record)
     return FileResponse(str(target), media_type="application/pdf", filename=target.name)
 
 
@@ -306,10 +324,12 @@ def preview_document(
         cached = record.artifacts.get("preview_pdf")
         try:
             if cached is None or not Path(cached).exists():
-                cached = export_pdf(
+                result = export_pdf(
                     record.artifacts["formatted"], workspaces.path(record.id), settings
                 )
+                cached = result.path
                 record.artifacts["preview_pdf"] = cached
+                record.page_count = result.page_count
                 store.update(record)
             return FileResponse(str(cached), media_type="application/pdf")
         except PdfExportError:

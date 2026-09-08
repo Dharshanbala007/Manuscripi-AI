@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
 from pypdf import PdfReader
@@ -26,6 +27,12 @@ class PdfExportError(Exception):
         self.unavailable = unavailable
 
 
+@dataclass
+class PdfResult:
+    path: Path
+    page_count: int
+
+
 def resolve_soffice(settings: Settings) -> str | None:
     if settings.soffice_path:
         p = Path(settings.soffice_path)
@@ -44,7 +51,7 @@ def pdf_available(settings: Settings) -> bool:
     return resolve_soffice(settings) is not None
 
 
-def export_pdf(formatted_path: Path | str, out_dir: Path | str, settings: Settings) -> Path:
+def export_pdf(formatted_path: Path | str, out_dir: Path | str, settings: Settings) -> PdfResult:
     soffice = resolve_soffice(settings)
     if soffice is None:
         raise PdfExportError("PDF export is unavailable on this machine.", unavailable=True)
@@ -90,4 +97,4 @@ def export_pdf(formatted_path: Path | str, out_dir: Path | str, settings: Settin
     if pages < 1:
         raise PdfExportError("The generated PDF has no pages.")
 
-    return pdf_path
+    return PdfResult(path=pdf_path, page_count=pages)
