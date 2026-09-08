@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     soffice_path: str = ""
     pdf_timeout_s: int = 60
 
+    history_db: Path = Path("./.workspace/history.db")
+    history_enabled: bool = True
+
     log_level: str = "INFO"
     log_format: str = "json"
 
