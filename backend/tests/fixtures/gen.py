@@ -165,6 +165,27 @@ def zip_bytes(entries: dict[str, bytes] | None = None, *, include_required: bool
     return buf.getvalue()
 
 
+def manuscript_from(path: Path):
+    """Parse + extract + classify a .docx on disk into a domain Manuscript."""
+    from app.classification.classifier import classify_blocks
+    from app.classification.structure import build_outline
+    from app.domain.manuscript import Manuscript
+    from app.extraction.metadata import extract_metadata
+    from app.parsing.docx_reader import parse_docx
+
+    parsed = parse_docx(path)
+    md = extract_metadata(parsed.blocks, 0.6)
+    blocks = classify_blocks(parsed.blocks, md, 0.6)
+    return Manuscript(
+        id="test-doc",
+        source_filename=Path(path).name,
+        metadata=md,
+        body=blocks,
+        outline=build_outline(blocks),
+        parse_warnings=parsed.parse_warnings,
+    )
+
+
 def _to_bytes(doc: Document) -> bytes:
     buf = io.BytesIO()
     doc.save(buf)
