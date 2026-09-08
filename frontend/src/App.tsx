@@ -1,7 +1,26 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import { AppShell } from "./components/layout/AppShell";
+import { ToastProvider } from "./components/ui/Toast";
+import { AnalyzePage } from "./pages/AnalyzePage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { UploadPage } from "./pages/UploadPage";
+import { WorkspacePage } from "./pages/WorkspacePage";
+
 export function App() {
   return (
-    <div className="grid min-h-full place-items-center p-8 font-sans text-zinc-500">
-      ManuScript AI — frontend scaffold
-    </div>
+    <ToastProvider>
+      <BrowserRouter>
+        <AppShell>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/analyze/:id" element={<AnalyzePage />} />
+            <Route path="/workspace/:id" element={<WorkspacePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AppShell>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
