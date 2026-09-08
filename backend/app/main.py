@@ -7,7 +7,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import routes_health
+from app.api import routes_documents, routes_health
+from app.api.errors import install_exception_handlers
 from app.config import get_settings
 from app.logging_config import configure_logging, log_stage
 from app.storage.memory import InMemoryDocumentStore
@@ -43,7 +44,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    install_exception_handlers(app)
     app.include_router(routes_health.router, prefix="/api")
+    app.include_router(routes_documents.router, prefix="/api")
     return app
 
 
