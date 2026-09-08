@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, UploadFile
 
+from app.analysis.corrections import apply_element, apply_metadata
 from app.analysis.pipeline import run_analysis
 from app.api.deps import get_settings_dep, get_store, get_workspaces
 from app.api.errors import ApiError
@@ -15,10 +16,12 @@ from app.schemas.analysis import (
     AnalysisOut,
     ElementOut,
     ElementPage,
+    ElementPatchIn,
     OutlineNodeOut,
     OutlineOut,
 )
 from app.schemas.document import DocumentOut
+from app.schemas.metadata import MetadataIn, MetadataOut
 from app.storage.base import DocumentRecord, DocumentStore
 from app.storage.workspace import WorkspaceManager
 from app.utils.text import shorten
@@ -27,6 +30,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 _STATUS_BY_CODE = {"too_large": 413, "not_docx": 415, "corrupt": 400, "unsafe_zip": 400}
 _BUSY_STATES = {"analyzing", "formatting", "validating", "exporting"}
+_EDITABLE_STATES = {"analyzed", "formatted", "validated"}
 
 
 def _require(store: DocumentStore, doc_id: str) -> DocumentRecord:
@@ -103,17 +107,57 @@ def get_elements(
     record = _require_analyzed(store, doc_id)
     body = record.manuscript.body
     window = body[offset : offset + limit]
-    items = [
-        ElementOut(
-            id=b.id,
-            kind=str(b.kind),
-            confidence=b.confidence,
-            text_preview=shorten(b.text, 160),
-            needs_review=b.needs_review,
-            level=b.level,
-            number=b.number,
-            section=b.section,
-        )
-        for b in window
-    ]
-    return ElementPage(items=items, total=len(body), offset=offset, limit=limit)
+    return ElementPage(
+        items=[_element_out(b) for b in window],
+        total=len(body),
+        offset=offset,
+        limit=limit,
+    )
+
+
+def _element_out(b) -> ElementOut:
+    return ElementOut(
+        id=b.id,
+        kind=str(b.kind),
+        confidence=b.confidence,
+        text_preview=shorten(b.text, 160),
+        needs_review=b.needs_review,
+        level=b.level,
+        number=b.number,
+        section=b.section,
+    )
+
+
+def _require_editable(store: DocumentStore, doc_id: str) -> DocumentRecord:
+    record = _require_analyzed(store, doc_id)
+    if record.state not in _EDITABLE_STATES:
+        raise ApiError(409, "wrong_state", f"Cannot edit a document in state '{record.state}'.")
+    return record
+
+
+@router.put("/{doc_id}/metadata", response_model=MetadataOut)
+def update_metadata(
+    doc_id: str, body: MetadataIn, store: DocumentStore = Depends(get_store)
+) -> MetadataOut:
+    record = _require_editable(store, doc_id)
+    md = apply_metadata(record, body)
+    store.update(record)
+    return MetadataOut.from_domain(md)
+
+
+@router.patch("/{doc_id}/elements/{block_id}", response_model=ElementOut)
+def update_element(
+    doc_id: str,
+    block_id: str,
+    body: ElementPatchIn,
+    store: DocumentStore = Depends(get_store),
+) -> ElementOut:
+    record = _require_editable(store, doc_id)
+    try:
+        block = apply_element(record, block_id, body.kind, body.level)
+    except ValueError:
+        raise ApiError(422, "bad_kind", f"'{body.kind}' is not a valid element kind.") from None
+    if block is None:
+        raise ApiError(404, "not_found", "Element not found.")
+    store.update(record)
+    return _element_out(block)

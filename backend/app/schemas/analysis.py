@@ -88,6 +88,11 @@ class ElementPage(BaseModel):
     limit: int
 
 
+class ElementPatchIn(BaseModel):
+    kind: str | None = None
+    level: int | None = None
+
+
 class OutlineNodeOut(BaseModel):
     id: str
     label: str

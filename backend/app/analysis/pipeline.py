@@ -106,7 +106,7 @@ def _run(record, store: DocumentStore, threshold: float) -> None:
         stats=stats,
         parse_warnings=parsed.parse_warnings,
     )
-    record.issues = _review_issues(record.manuscript)
+    record.issues = review_issues(record.manuscript)
 
 
 class _stage:
@@ -159,7 +159,7 @@ def _compute_stats(blocks) -> DocumentStats:
     )
 
 
-def _review_issues(ms: Manuscript) -> list[Issue]:
+def review_issues(ms: Manuscript) -> list[Issue]:
     issues: list[Issue] = []
     md = ms.metadata
 

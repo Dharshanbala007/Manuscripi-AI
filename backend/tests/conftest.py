@@ -26,3 +26,28 @@ def client():
     app = create_app()
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def analyzed_doc(client):
+    """(client, doc_id) for a document that has finished analysis."""
+    import io
+    import time
+
+    from tests.fixtures.gen import academic_docx
+
+    ct = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    doc_id = client.post(
+        "/api/documents/upload",
+        files={"file": ("paper.docx", io.BytesIO(academic_docx()), ct)},
+    ).json()["id"]
+    client.post(f"/api/documents/{doc_id}/analyze")
+
+    state = "analyzing"
+    for _ in range(100):
+        state = client.get(f"/api/documents/{doc_id}/analysis").json()["state"]
+        if state in ("analyzed", "error"):
+            break
+        time.sleep(0.02)
+    assert state == "analyzed"
+    return client, doc_id
