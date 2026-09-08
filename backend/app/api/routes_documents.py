@@ -10,6 +10,7 @@ from app.api.deps import get_settings_dep, get_store, get_workspaces
 from app.api.errors import ApiError
 from app.config import Settings
 from app.domain.analysis import AnalysisProgress
+from app.formatting.run import ProfileUnavailable, run_format, run_validate
 from app.ingestion.receive import receive_upload
 from app.ingestion.validate_upload import UploadValidationError
 from app.schemas.analysis import (
@@ -21,7 +22,14 @@ from app.schemas.analysis import (
     OutlineOut,
 )
 from app.schemas.document import DocumentOut
+from app.schemas.formatting import (
+    ChangeLogOut,
+    FormatIn,
+    FormatOut,
+    ValidateOut,
+)
 from app.schemas.metadata import MetadataIn, MetadataOut
+from app.schemas.validation import HealthScoreOut, IssueOut, PreservationOut
 from app.storage.base import DocumentRecord, DocumentStore
 from app.storage.workspace import WorkspaceManager
 from app.utils.text import shorten
@@ -161,3 +169,55 @@ def update_element(
         raise ApiError(404, "not_found", "Element not found.")
     store.update(record)
     return _element_out(block)
+
+
+@router.post("/{doc_id}/format", response_model=FormatOut)
+def format_document_endpoint(
+    doc_id: str,
+    body: FormatIn,
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+) -> FormatOut:
+    record = _require_analyzed(store, doc_id)
+    if record.state not in ("analyzed", "formatted", "validated"):
+        raise ApiError(409, "wrong_state", f"Cannot format a document in state '{record.state}'.")
+
+    try:
+        change_log, health, issues, preservation = run_format(record, workspaces, body.profile_id)
+    except ProfileUnavailable as exc:
+        message = (
+            f"The '{exc.profile_id}' profile is planned but not available yet."
+            if exc.planned
+            else f"Unknown format profile '{exc.profile_id}'."
+        )
+        raise ApiError(422, "profile_unavailable", message) from None
+
+    store.update(record)
+    return FormatOut(
+        state=record.state,
+        profile_id=body.profile_id,
+        change_log=ChangeLogOut.from_domain(change_log),
+        health=HealthScoreOut.from_domain(health),
+        issues=[IssueOut.from_domain(i) for i in issues],
+        preservation=PreservationOut.from_domain(preservation),
+    )
+
+
+@router.post("/{doc_id}/validate", response_model=ValidateOut)
+def validate_document_endpoint(
+    doc_id: str,
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+) -> ValidateOut:
+    record = _require_analyzed(store, doc_id)
+    if record.state not in ("formatted", "validated"):
+        raise ApiError(409, "wrong_state", "Format the document before validating.")
+
+    issues, health, preservation = run_validate(record, workspaces)
+    store.update(record)
+    return ValidateOut(
+        state=record.state,
+        issues=[IssueOut.from_domain(i) for i in issues],
+        health=HealthScoreOut.from_domain(health),
+        preservation=PreservationOut.from_domain(preservation),
+    )
