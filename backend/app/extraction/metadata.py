@@ -25,11 +25,13 @@ _SECTION_LABEL_RE = re.compile(
     re.IGNORECASE,
 )
 _ORG_RE = re.compile(
-    r"\b(univ|universit|institut|department|dept\.?|laborator|labs?|college|academy|"
-    r"school of|centre|center for|gmbh|inc\.?|ltd\.?|corporation)\b",
+    r"\b(universit\w*|univ|institut\w*|departments?|dept\.?|laborator\w*|labs?|"
+    r"college|academy|school of|faculty|centre|center for|hospital|clinic|"
+    r"gmbh|inc\.?|ltd\.?|llc|corp\.?|corporation)\b",
     re.IGNORECASE,
 )
-_SUP_MARKERS = "*†‡§¶∗"
+_SUP_MARKERS = "*†‡§¶∗¹²³⁰⁴⁵⁶⁷⁸⁹"
+_SUP_RE = re.compile(r"[¹²³⁰-⁹\*†‡§¶∗]")
 _NAME_CHARS_RE = re.compile(r"[A-Za-z.\-'À-ɏ ]+")
 
 # ponytail: hand-tuned weights; adjust against sample_documents if precision drifts.
@@ -186,9 +188,9 @@ def _split_names(text: str) -> list[str]:
     parts = re.split(r"\s*,\s*|\s+and\s+|\s*&\s*|\s*;\s*", text)
     out = []
     for part in parts:
-        p = part.strip().strip(_SUP_MARKERS).strip()
-        p = re.sub(r"[\s,]*[\d\*†‡]+$", "", p).strip()
-        p = re.sub(r"^[\d\*†‡]+\s*", "", p).strip()
+        p = _SUP_RE.sub("", part).strip().strip(_SUP_MARKERS).strip()
+        p = re.sub(r"[\s,]*\d+$", "", p).strip()
+        p = re.sub(r"^\d+\s*", "", p).strip()
         if p:
             out.append(p)
     return out
@@ -198,7 +200,7 @@ def _looks_like_name(s: str) -> bool:
     if not s or len(s) > 60 or _ORG_RE.search(s) or EMAIL_RE.search(s):
         return False
     tokens = s.split()
-    if not 1 <= len(tokens) <= 5:
+    if not 2 <= len(tokens) <= 5:  # a bare single word is rarely a full author name
         return False
     if not _NAME_CHARS_RE.fullmatch(s):
         return False

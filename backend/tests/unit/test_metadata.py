@@ -83,6 +83,27 @@ def test_inline_abstract_lead_in():
     assert [a.name for a in md.authors.value] == ["Jane Roe"]
 
 
+def test_authors_with_superscript_markers_and_affiliation_lines():
+    blocks = [
+        pb("A Clear Title", size=18, bold=True, align="center", idx=0),
+        pb("Ada Lovelace¹, Alan Turing², Grace Hopper¹ and Katherine Johnson³", idx=1),
+        pb("¹ Department of Computing, University of Somewhere", idx=2),
+        pb("² Institute for Advanced Study, Elsewhere", idx=3),
+        pb("³ Numerical Analysis Laboratory, Farfield College", idx=4),
+    ]
+    md = extract_metadata(blocks, 0.6)
+    assert [a.name for a in md.authors.value] == [
+        "Ada Lovelace",
+        "Alan Turing",
+        "Grace Hopper",
+        "Katherine Johnson",
+    ]
+    aff_text = " | ".join(a.text for a in md.affiliations)
+    assert "Institute for Advanced Study" in aff_text
+    assert "University of Somewhere" in aff_text
+    assert "Elsewhere" not in [a.name for a in md.authors.value]
+
+
 def test_keywords_plain_label_semicolons():
     blocks = [pb("Keywords: alpha; beta ; gamma", idx=0)]
     md = extract_metadata(blocks, 0.6)

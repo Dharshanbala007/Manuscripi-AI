@@ -1,0 +1,142 @@
+# ManuScript AI
+
+Turn an unformatted academic Word manuscript into a publication-ready document —
+locally, with no cloud services and no LLM APIs. Upload a `.docx`, review the
+detected structure, apply a publisher format profile, validate the result, and
+export a verified DOCX or PDF.
+
+> **Privacy:** manuscript content is processed entirely on your machine. Nothing
+> is uploaded to OpenAI, Claude, Gemini, or any external document service. The
+> processing pipeline needs no internet connection.
+
+## Features
+
+- **DOCX ingestion** — drag-and-drop or browse; magic-byte + ZIP-structure
+  validation, zip-bomb and path-traversal guards, size limit. The original file
+  is never modified.
+- **Rule-based analysis** — an ordered element stream, metadata heuristics
+  (title / authors / affiliations / abstract / keywords) and per-element
+  classification, each with a confidence score. Low-confidence items are flagged.
+- **Canonical structure detection** — Introduction, Related Work, Methods,
+  Results, Discussion, Conclusion, References, Appendix, plus common synonyms.
+- **Publisher profiles** — configurable YAML; every rule tagged
+  *implemented / configurable / inferred / unsupported* (see `docs/RULES.md`).
+  **IEEE** ships; **Springer** is listed as *planned*.
+- **Formatting engine** — works on a copy: named styles, page geometry and
+  columns, body restyle (emphasis preserved), table/figure checks, and a
+  front-matter rebuild from your reviewed metadata.
+- **Validation + health score** — DOCUMENT / STRUCTURE / FORMATTING / CONTENT /
+  REFERENCES / LAYOUT checks; a 0–100 health score computed from real issues.
+- **Content-preservation check** — body text is hashed before and after; the
+  "What changed" panel only says *no content changed* when that actually holds.
+- **Export** — verified DOCX; PDF via headless LibreOffice when available, with a
+  clear "unavailable" state otherwise. Structural HTML preview as a fallback.
+- **Workspace** — interactive outline, metadata editor, element list with inline
+  reclassification, issue center with severity filters, before/after summary.
+
+The product never claims a document is "IEEE compliant" — it reports *"IEEE
+format profile applied"* and *"IEEE validation checks passed"* for the checks it
+actually ran.
+
+## Architecture
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). In short: a FastAPI backend
+holding a layered, independently-testable pipeline (`ingestion → parsing →
+extraction → classification → analysis → formatting → validation → export`), and
+a React + TypeScript + Tailwind frontend with a typed API client and an explicit
+processing state machine.
+
+## Technology
+
+| Area | Stack |
+|---|---|
+| Backend | Python 3.12, FastAPI, python-docx, Pydantic v2, Uvicorn, pypdf, PyYAML |
+| PDF | headless LibreOffice (`soffice`) — local, optional |
+| Frontend | React 18, TypeScript, Vite 5, Tailwind 3, lucide-react |
+| Tests | pytest (unit / integration / API), vitest (state machine, api client, components) |
+
+## Setup
+
+Requires **Python 3.12** and **Node 20+**. On Windows, if `python` resolves to a
+bundled interpreter, create the venv with an explicit interpreter (e.g. `py -3.12`
+or [`uv`](https://docs.astral.sh/uv/)).
+
+```bash
+# Backend
+cd backend
+python -m venv .venv                      # or: uv venv .venv --python 3.12
+.venv/Scripts/python -m pip install -r requirements-dev.txt   # uv pip install ... on uv
+cp .env.example .env
+
+# Frontend
+cd ../frontend
+npm install
+cp .env.example .env
+```
+
+Optional, for real PDF export: install
+[LibreOffice](https://www.libreoffice.org/). It is auto-detected; set
+`SOFFICE_PATH` in `backend/.env` if it is not on `PATH`.
+
+## Running
+
+```bash
+# Both servers (from the repo root)
+bash scripts/dev.sh          # or: pwsh scripts/dev.ps1
+```
+
+Or separately:
+
+```bash
+cd backend  && .venv/Scripts/python -m uvicorn app.main:app --reload   # http://localhost:8000
+cd frontend && npm run dev                                             # http://localhost:5173
+```
+
+API docs: `http://localhost:8000/docs`.
+
+## Tests
+
+```bash
+bash scripts/check.sh        # ruff + pytest + tsc + vitest
+
+# or individually
+cd backend  && .venv/Scripts/python -m pytest
+cd frontend && npm test && npx tsc -b --noEmit
+```
+
+## Sample documents
+
+```bash
+python scripts/gen_samples.py     # writes sample_documents/sample_{basic,complex,messy}.docx
+python scripts/gen_rules_doc.py   # regenerates docs/RULES.md from the profile YAML
+```
+
+## Supported publication formats
+
+| Profile | Status | Notes |
+|---|---|---|
+| IEEE | Available | Two-column US Letter, 10 pt Times body, roman-numeral headings, `Abstract—` / `Index Terms—` blocks, bracketed `[n]` references. See `docs/RULES.md` for every rule's provenance. |
+| Springer | Planned | Listed in the UI as planned; `POST /format` returns 422 until its profile ships. |
+
+## Known limitations
+
+- Heading auto-numbering (e.g. `I.`, `A.`) and run-in level-3 headings are
+  **not** injected by the engine — only typography, alignment, spacing, and an
+  optional upper-case transform are applied.
+- Oversize tables and figures are **flagged**, never resized.
+- Equations, footnotes, hyperlinks, and field codes are preserved as-is, not
+  reformatted.
+- Document history / dashboard "recent" list, a visual before/after diff, and a
+  Springer profile are not in this release.
+- The `DocumentStore` is in-process: state is lost when the backend restarts
+  (working files persist on disk until the TTL sweep).
+
+## Future extension points
+
+- SQLite-backed `DocumentStore` for local history (no pipeline changes).
+- Additional publisher profiles as YAML.
+- Optional ML assist behind the existing confidence-returning interfaces.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
