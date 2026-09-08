@@ -8,6 +8,21 @@ from fastapi.testclient import TestClient
 from app.config import get_settings
 
 
+@pytest.fixture(scope="session")
+def sample_dir():
+    from pathlib import Path
+
+    return Path(__file__).parents[2] / "sample_documents"
+
+
+@pytest.fixture(params=["sample_basic", "sample_complex", "sample_messy"])
+def sample_docx(request, sample_dir):
+    path = sample_dir / f"{request.param}.docx"
+    if not path.exists():
+        pytest.skip(f"{path.name} not generated; run scripts/gen_samples.py")
+    return path
+
+
 @pytest.fixture(autouse=True)
 def _isolated_settings(tmp_path, monkeypatch):
     """Every test gets a fresh Settings bound to a throwaway work dir."""
