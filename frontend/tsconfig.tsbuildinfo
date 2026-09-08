@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/lib/api.ts","./src/lib/format.ts","./src/lib/types.ts","./src/state/usedocumentflow.ts","./src/tests/api.test.ts","./src/tests/setup.ts","./src/tests/state.test.ts","./vite.config.ts","./vitest.config.ts","./tailwind.config.ts"],"version":"5.9.3"}
