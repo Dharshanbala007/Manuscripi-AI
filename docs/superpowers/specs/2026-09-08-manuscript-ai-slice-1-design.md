@@ -265,8 +265,9 @@ number). `GET /api/formats`: IEEE `available`, Springer `planned`.
 5. Save; return `formatted.docx` path + `ChangeLog` + new issues.
 
 Styles-first, minimal direct run edits (spec §15). Equations, footnotes, hyperlinks, and
-fields are untouched. Deterministic: same input + profile → identical output, for
-preservation tests.
+fields are untouched. Deterministic at the content level: the same input + profile yields
+the same *normalized body text and element counts* every run (raw bytes may differ due to
+DOCX-embedded timestamps) — this is what the preservation tests assert.
 
 ---
 
