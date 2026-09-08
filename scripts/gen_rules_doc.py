@@ -18,7 +18,7 @@ from app.profiles.rules_doc import render_rules_md  # noqa: E402
 def main() -> None:
     profile = load_profile("ieee")
     out = _ROOT / "docs" / "RULES.md"
-    out.write_text(render_rules_md(profile), encoding="utf-8")
+    out.write_text(render_rules_md(profile), encoding="utf-8", newline="\n")
     print(f"wrote {out.relative_to(_ROOT)}")
 
 
