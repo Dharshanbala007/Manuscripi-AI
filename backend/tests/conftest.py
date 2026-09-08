@@ -29,6 +29,7 @@ def _isolated_settings(tmp_path, monkeypatch):
     monkeypatch.setenv("WORK_DIR", str(tmp_path / "ws"))
     monkeypatch.setenv("WORKSPACE_TTL_MIN", "120")
     monkeypatch.setenv("MAX_UPLOAD_MB", "25")
+    monkeypatch.setenv("HISTORY_DB", str(tmp_path / "history.db"))
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
