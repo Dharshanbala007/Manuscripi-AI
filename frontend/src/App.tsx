@@ -10,7 +10,7 @@ import { WorkspacePage } from "./pages/WorkspacePage";
 export function App() {
   return (
     <ToastProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AppShell>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
