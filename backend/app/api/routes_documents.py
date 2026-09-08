@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 
+from app.analysis.comparison import build_comparison
 from app.analysis.corrections import apply_element, apply_metadata
 from app.analysis.pipeline import run_analysis
 from app.api.deps import get_history, get_settings_dep, get_store, get_workspaces
@@ -28,6 +29,7 @@ from app.schemas.analysis import (
     OutlineNodeOut,
     OutlineOut,
 )
+from app.schemas.comparison import ComparisonOut
 from app.schemas.document import DocumentOut
 from app.schemas.formatting import (
     ChangeLogOut,
@@ -251,6 +253,14 @@ def _require_formatted(store: DocumentStore, doc_id: str) -> DocumentRecord:
     if "formatted" not in record.artifacts:
         raise ApiError(409, "not_formatted", "Apply a format before exporting or previewing.")
     return record
+
+
+@router.get("/{doc_id}/comparison", response_model=ComparisonOut)
+def get_comparison(doc_id: str, store: DocumentStore = Depends(get_store)) -> ComparisonOut:
+    record = _require(store, doc_id)
+    if "formatted" not in record.artifacts:
+        raise ApiError(409, "not_formatted", "Format the document before comparing.")
+    return ComparisonOut.from_domain(build_comparison(record))
 
 
 def _export_basename(record: DocumentRecord, ext: str) -> str:
