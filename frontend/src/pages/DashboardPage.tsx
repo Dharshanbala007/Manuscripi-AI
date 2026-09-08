@@ -2,10 +2,10 @@ import { ArrowRight, FileText, Lock, ShieldCheck, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { RecentList } from "../components/dashboard/RecentList";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
-import { EmptyState } from "../components/ui/Feedback";
 import { api } from "../lib/api";
 import type { ProfileSummary } from "../lib/types";
 
@@ -71,14 +71,12 @@ export function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader title="Recent manuscripts" description="Local history arrives in a later release." />
+        <CardHeader
+          title="Recent manuscripts"
+          description="Local history — stored on this machine, no manuscript content."
+        />
         <CardBody>
-          <EmptyState
-            icon={FileText}
-            title="No manuscripts yet"
-            description="Upload a .docx to run it through the pipeline."
-            action={<Button size="sm" variant="secondary" onClick={() => navigate("/upload")}>Upload a manuscript</Button>}
-          />
+          <RecentList />
         </CardBody>
       </Card>
     </div>
