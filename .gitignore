@@ -20,6 +20,9 @@ dist/
 backend/.workspace/
 *.log
 
+# Test tooling
+.playwright-mcp/
+
 # Env
 .env
 .env.*

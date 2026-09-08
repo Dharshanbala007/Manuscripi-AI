@@ -50,7 +50,7 @@ export function Dialog({
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-raised focus:outline-none"
+        className="my-8 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-raised focus:outline-none"
       >
         <div className="flex items-start justify-between gap-4">
           <div>

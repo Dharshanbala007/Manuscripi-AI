@@ -42,9 +42,9 @@ def format_document(
     ensure_styles(doc, profile)
     apply_page_layout(doc, profile)
 
+    page_size = {"letter": "US Letter", "a4": "A4"}.get(profile.page.size, profile.page.size)
     changes: list[str] = [
-        f"Applied {profile.name} page layout "
-        f"({profile.columns.count}-column, {profile.page.size.upper()})"
+        f"Applied {profile.name} page layout ({profile.columns.count}-column, {page_size})"
     ]
     changes += restyle_body(doc, manuscript, profile)
 
