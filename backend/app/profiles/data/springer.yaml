@@ -1,0 +1,184 @@
+# Springer format profile.
+#
+# IMPORTANT: this is ONE generic Springer-oriented profile, not a specific journal
+# or conference template. Springer templates vary substantially by publication
+# (LNCS, journal, book chapter, ...). Values here are chosen as reasonable defaults
+# for this project, not taken from an official source - hence most groups are tagged
+# `inferred` or `configurable`. Add template variants later as separate YAML files.
+#
+# The product never claims a document is "Springer compliant" - only "Springer
+# format profile applied" and "Springer validation checks passed" for checks it ran.
+
+id: springer
+name: Springer
+summary: Single-column A4 layout with decimal-numbered headings and structured references.
+status: available
+features:
+  - Single-column A4 layout
+  - Decimal-numbered section headings
+  - "Abstract and Keywords as labelled blocks"
+  - "Bracketed [n] references with a hanging indent"
+
+page:
+  provenance: inferred
+  note: A4 with ~1 in (2.5 cm) margins - a common Springer starting point, not a template value.
+  size: a4
+  margin_top_in: 1.0
+  margin_bottom_in: 1.0
+  margin_left_in: 1.0
+  margin_right_in: 1.0
+
+columns:
+  provenance: inferred
+  note: Single column - the common case for Springer journal and LNCS body text.
+  count: 1
+  spacing_in: 0.0
+
+base_font:
+  provenance: inferred
+  note: 10 pt serif. Real Springer templates use a bespoke serif; Times New Roman stands in.
+  family: Times New Roman
+  size_pt: 10.0
+
+spacing:
+  provenance: inferred
+  note: Single line spacing; exact lead values are not encoded.
+  line: 1.0
+  paragraph_before_pt: 0.0
+  paragraph_after_pt: 0.0
+
+title:
+  provenance: inferred
+  note: Centered, larger than body, bold.
+  size_pt: 15.0
+  bold: true
+  italic: false
+  align: center
+  case: as_is
+
+author:
+  provenance: inferred
+  note: Centered author line below the title.
+  size_pt: 10.0
+  align: center
+  italic: false
+
+affiliation:
+  provenance: inferred
+  note: Centered italic affiliation lines.
+  size_pt: 9.0
+  align: center
+  italic: true
+
+abstract:
+  provenance: inferred
+  note: "'Abstract' as a heading (not a run-in lead-in); slightly smaller, justified."
+  heading_text: Abstract
+  inline_lead_in: false
+  size_pt: 9.0
+  bold_label: false
+  italic_body: false
+  align: justify
+
+keywords:
+  provenance: inferred
+  note: "'Keywords' label, not italicised."
+  label: Keywords
+  size_pt: 9.0
+  italic: false
+  separator: ", "
+
+headings:
+  provenance: configurable
+  note: >
+    Decimal numbering (1, 1.1, 1.1.1) is a documented Springer convention, but the
+    engine does not inject the numbering prefixes - only typography, weight, and
+    spacing are applied. Sizes are inferred.
+  levels:
+    1:
+      size_pt: 12.0
+      bold: true
+      italic: false
+      align: left
+      case: as_is
+      numbering: decimal
+      space_before_pt: 12.0
+      space_after_pt: 4.0
+    2:
+      size_pt: 11.0
+      bold: true
+      italic: false
+      align: left
+      case: as_is
+      numbering: decimal
+      space_before_pt: 10.0
+      space_after_pt: 3.0
+    3:
+      size_pt: 10.0
+      bold: true
+      italic: false
+      align: left
+      case: as_is
+      numbering: decimal
+      space_before_pt: 8.0
+      space_after_pt: 3.0
+
+paragraphs:
+  provenance: inferred
+  note: First-line indent; justified body.
+  first_line_indent_in: 0.2
+  align: justify
+
+captions:
+  provenance: inferred
+  note: '"Fig. N" below the figure; "Table N" above the table; ~9 pt.'
+  figure:
+    prefix: "Fig."
+    numbering: decimal
+    separator: ". "
+    size_pt: 9.0
+    italic: false
+    align: left
+    position: below
+    case: as_is
+  table:
+    prefix: "Table"
+    numbering: decimal
+    separator: " "
+    size_pt: 9.0
+    italic: false
+    align: left
+    position: above
+    case: as_is
+
+tables:
+  provenance: configurable
+  note: Grid style with a bold header row; oversize tables are flagged, never shrunk.
+  style_name: Table Grid
+  header_bold: true
+  max_width_action: flag
+
+figures:
+  provenance: configurable
+  note: Centered, single-page width; oversize figures are flagged, never scaled.
+  max_width_in: 5.5
+  center: true
+  oversize_action: flag
+
+references:
+  provenance: configurable
+  note: >
+    Bracketed [n] numbering with a hanging indent. Author-year is the other common
+    Springer style and is not implemented.
+  style: numeric-bracket
+  size_pt: 9.0
+  hanging_indent_in: 0.25
+  numbering: bracket
+
+validation:
+  provenance: configurable
+  note: Thresholds the validator uses when checking the formatted output.
+  body_font_tolerance_pt: 0.75
+  require_abstract: true
+  require_keywords: true
+  max_table_cols_before_flag: 10

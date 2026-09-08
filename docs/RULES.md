@@ -33,5 +33,28 @@ Two-column academic layout with structured headings and IEEE-style references.
 | `references` | implemented | style=numeric-bracket, size_pt=8.0, hanging_indent_in=0.2, numbering=bracket | 8 pt, bracketed [n] numbering with a hanging indent. |
 | `validation` | configurable | body_font_tolerance_pt=0.75, require_abstract=True, require_keywords=True, max_table_cols_before_flag=8 | Thresholds the validator uses when checking the formatted output. |
 
-> The product never claims a document is "IEEE compliant". It reports "IEEE format profile applied" and, after validation, "IEEE validation checks passed" for the checks it actually ran.
+## Springer (`springer`)
+
+Single-column A4 layout with decimal-numbered headings and structured references.
+
+| Rule group | Provenance | Key values | Note |
+| --- | --- | --- | --- |
+| `page` | inferred | size=a4, margin_top_in=1.0, margin_bottom_in=1.0, margin_left_in=1.0, margin_right_in=1.0 | A4 with ~1 in (2.5 cm) margins - a common Springer starting point, not a template value. |
+| `columns` | inferred | count=1, spacing_in=0.0 | Single column - the common case for Springer journal and LNCS body text. |
+| `base_font` | inferred | family=Times New Roman, size_pt=10.0 | 10 pt serif. Real Springer templates use a bespoke serif; Times New Roman stands in. |
+| `spacing` | inferred | line=1.0, paragraph_before_pt=0.0, paragraph_after_pt=0.0 | Single line spacing; exact lead values are not encoded. |
+| `title` | inferred | font_family=None, size_pt=15.0, bold=True, italic=False, align=center, case=as_is | Centered, larger than body, bold. |
+| `author` | inferred | size_pt=10.0, align=center, italic=False | Centered author line below the title. |
+| `affiliation` | inferred | size_pt=9.0, align=center, italic=True | Centered italic affiliation lines. |
+| `abstract` | inferred | heading_text=Abstract, inline_lead_in=False, size_pt=9.0, bold_label=False, italic_body=False, align=justify | 'Abstract' as a heading (not a run-in lead-in); slightly smaller, justified. |
+| `keywords` | inferred | label=Keywords, size_pt=9.0, italic=False, separator=,  | 'Keywords' label, not italicised. |
+| `headings` | configurable | levels={1: {'size_pt': 12.0, 'bold': True, 'italic': False, 'align': 'left', 'case': 'as_is', 'numbering': 'decimal', 'space_before_pt': 12.0, 'space_after_pt'… | Decimal numbering (1, 1.1, 1.1.1) is a documented Springer convention, but the engine does not inject the numbering prefixes - only typography, weight, and spacing are applied. Sizes are inferred. |
+| `paragraphs` | inferred | first_line_indent_in=0.2, align=justify | First-line indent; justified body. |
+| `captions` | inferred | figure={'prefix': 'Fig.', 'numbering': 'decimal', 'separator': '. ', 'size_pt': 9.0, 'italic': False, 'align': 'left', 'position': 'below', 'case': 'as_is'}, t… | "Fig. N" below the figure; "Table N" above the table; ~9 pt. |
+| `tables` | configurable | style_name=Table Grid, header_bold=True, max_width_action=flag | Grid style with a bold header row; oversize tables are flagged, never shrunk. |
+| `figures` | configurable | max_width_in=5.5, center=True, oversize_action=flag | Centered, single-page width; oversize figures are flagged, never scaled. |
+| `references` | configurable | style=numeric-bracket, size_pt=9.0, hanging_indent_in=0.25, numbering=bracket | Bracketed [n] numbering with a hanging indent. Author-year is the other common Springer style and is not implemented. |
+| `validation` | configurable | body_font_tolerance_pt=0.75, require_abstract=True, require_keywords=True, max_table_cols_before_flag=10 | Thresholds the validator uses when checking the formatted output. |
+
+> The product never claims a document is "IEEE compliant" or "Springer compliant". It reports "<profile> format profile applied" and, after validation, "<profile> validation checks passed" for the checks it actually ran.
 

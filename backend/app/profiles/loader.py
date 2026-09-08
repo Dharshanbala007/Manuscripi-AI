@@ -14,17 +14,7 @@ _DATA_DIR = Path(__file__).parent / "data"
 
 # Publishers we intend to support but do not yet ship a full profile for.
 # Surfaced honestly in GET /api/formats and rejected by POST /format.
-PLANNED_PROFILES: dict[str, dict] = {
-    "springer": {
-        "name": "Springer",
-        "summary": "Springer-oriented manuscript structure with configurable layout.",
-        "features": [
-            "Single-column layout",
-            "Structured headings",
-            "Springer-style references",
-        ],
-    }
-}
+PLANNED_PROFILES: dict[str, dict] = {}
 
 
 class ProfileNotFound(Exception):
@@ -47,6 +37,10 @@ def load_profile(profile_id: str) -> PublisherProfile:
         raise ProfileNotFound(profile_id)
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     return PublisherProfile.model_validate(raw)
+
+
+def load_all_profiles() -> list[PublisherProfile]:
+    return [load_profile(path.stem) for path in sorted(_DATA_DIR.glob("*.yaml"))]
 
 
 def list_profiles() -> list[ProfileSummary]:

@@ -31,12 +31,15 @@ def test_validate_after_format_sets_state_validated(analyzed_doc):
     assert body["preservation"]["passed"] is True
 
 
-def test_format_with_springer_is_422_planned(analyzed_doc):
+def test_format_with_springer_is_200(analyzed_doc):
     client, doc_id = analyzed_doc
     resp = client.post(f"/api/documents/{doc_id}/format", json={"profile_id": "springer"})
-    assert resp.status_code == 422
-    assert resp.json()["error"] == "profile_unavailable"
-    assert "planned" in resp.json()["message"].lower()
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["state"] == "formatted"
+    assert body["profile_id"] == "springer"
+    assert body["change_log"]["content_changes"] == []
+    assert body["preservation"]["passed"] is True
 
 
 def test_format_with_unknown_profile_is_422(analyzed_doc):
