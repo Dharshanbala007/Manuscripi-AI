@@ -8,19 +8,20 @@ from __future__ import annotations
 
 import time
 
+from app.analysis.stats import compute_stats
 from app.classification.classifier import classify_blocks
 from app.classification.structure import build_outline
 from app.domain.analysis import AnalysisProgress, StageStatus
 from app.domain.elements import ElementType
 from app.domain.issues import Issue, IssueCategory, Severity
-from app.domain.manuscript import DocumentStats, Manuscript
+from app.domain.manuscript import Manuscript
 from app.extraction.metadata import extract_metadata
 from app.logging_config import log_stage, logger
 from app.parsing.docx_reader import DocxReadError, parse_docx
 from app.storage.base import DocumentStore
 from app.storage.history import HistoryEntry, HistoryStore
 from app.utils.ids import short_id
-from app.utils.text import count_words, shorten
+from app.utils.text import shorten
 
 _HEADING_KINDS = (ElementType.HEADING, ElementType.SUBHEADING)
 
@@ -101,7 +102,7 @@ def _run(record, store: DocumentStore, threshold: float) -> None:
 
     with _stage(prog, store, record, "structure") as done:
         outline = build_outline(blocks)
-        stats = _compute_stats(blocks)
+        stats = compute_stats(blocks)
         done(f"{stats.sections} sections")
 
     record.manuscript = Manuscript(
@@ -152,18 +153,6 @@ def _metadata_detail(md) -> str:
     if md.keywords.value:
         bits.append(f"{len(md.keywords.value)} keywords")
     return ", ".join(bits) if bits else "no metadata detected"
-
-
-def _compute_stats(blocks) -> DocumentStats:
-    return DocumentStats(
-        words=sum(count_words(b.text) for b in blocks),
-        paragraphs=sum(1 for b in blocks if b.kind == ElementType.PARAGRAPH),
-        headings=sum(1 for b in blocks if b.kind in _HEADING_KINDS),
-        tables=sum(1 for b in blocks if b.kind == ElementType.TABLE),
-        figures=sum(1 for b in blocks if b.kind == ElementType.FIGURE),
-        references=sum(1 for b in blocks if b.kind == ElementType.REFERENCE_ITEM),
-        sections=sum(1 for b in blocks if b.kind == ElementType.HEADING),
-    )
 
 
 def review_issues(ms: Manuscript) -> list[Issue]:

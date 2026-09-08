@@ -35,9 +35,16 @@ def test_export_pdf_is_real_pdf_or_503(analyzed_doc):
         assert resp.status_code == 200
         assert resp.headers["content-type"] == "application/pdf"
         assert resp.content[:5] == b"%PDF-"
+        page_count = client.get(f"/api/documents/{doc_id}/analysis").json()["page_count"]
+        assert isinstance(page_count, int) and page_count >= 1
     else:
         assert resp.status_code == 503
         assert resp.json()["error"] == "pdf_unavailable"
+
+
+def test_page_count_is_null_before_any_pdf(analyzed_doc):
+    client, doc_id = _formatted(analyzed_doc)
+    assert client.get(f"/api/documents/{doc_id}/analysis").json()["page_count"] is None
 
 
 def test_preview_returns_pdf_or_labelled_structured_html(analyzed_doc):

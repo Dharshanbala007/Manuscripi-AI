@@ -48,6 +48,7 @@ class AnalysisOut(BaseModel):
     issues: list[IssueOut] = []
     error: str | None = None
     profile_id: str | None = None
+    page_count: int | None = None
     health: HealthScoreOut | None = None
     change_log: ChangeLogOut | None = None
     preservation: PreservationOut | None = None
@@ -73,6 +74,7 @@ class AnalysisOut(BaseModel):
             issues=[IssueOut.from_domain(i) for i in record.issues],
             error=record.error,
             profile_id=record.profile_id,
+            page_count=record.page_count,
             health=HealthScoreOut.from_domain(record.health) if record.health else None,
             change_log=ChangeLogOut.from_domain(record.change_log) if record.change_log else None,
             preservation=(
