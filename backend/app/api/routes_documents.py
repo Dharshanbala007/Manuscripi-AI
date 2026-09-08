@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, UploadFile
+from fastapi.responses import FileResponse, HTMLResponse
 
 from app.analysis.corrections import apply_element, apply_metadata
 from app.analysis.pipeline import run_analysis
@@ -10,6 +14,9 @@ from app.api.deps import get_settings_dep, get_store, get_workspaces
 from app.api.errors import ApiError
 from app.config import Settings
 from app.domain.analysis import AnalysisProgress
+from app.export.docx_export import ExportError, export_docx
+from app.export.pdf_export import PdfExportError, export_pdf, pdf_available
+from app.export.preview import render_structured_html
 from app.formatting.run import ProfileUnavailable, run_format, run_validate
 from app.ingestion.receive import receive_upload
 from app.ingestion.validate_upload import UploadValidationError
@@ -221,3 +228,103 @@ def validate_document_endpoint(
         health=HealthScoreOut.from_domain(health),
         preservation=PreservationOut.from_domain(preservation),
     )
+
+
+_DOCX_MEDIA = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+
+def _require_formatted(store: DocumentStore, doc_id: str) -> DocumentRecord:
+    record = _require(store, doc_id)
+    if "formatted" not in record.artifacts:
+        raise ApiError(409, "not_formatted", "Apply a format before exporting or previewing.")
+    return record
+
+
+def _export_basename(record: DocumentRecord, ext: str) -> str:
+    return f"manuscript_{record.profile_id or 'ieee'}_formatted.{ext}"
+
+
+@router.get("/{doc_id}/export/docx")
+def export_document_docx(
+    doc_id: str,
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+) -> FileResponse:
+    record = _require_formatted(store, doc_id)
+    out = workspaces.path(record.id, _export_basename(record, "docx"))
+    try:
+        export_docx(record.artifacts["formatted"], out)
+    except ExportError as exc:
+        raise ApiError(500, "export_failed", str(exc)) from None
+
+    record.artifacts["export_docx"] = out
+    record.state = "exported"
+    store.update(record)
+    return FileResponse(str(out), media_type=_DOCX_MEDIA, filename=out.name)
+
+
+@router.get("/{doc_id}/export/pdf")
+def export_document_pdf(
+    doc_id: str,
+    settings: Settings = Depends(get_settings_dep),
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+) -> FileResponse:
+    record = _require_formatted(store, doc_id)
+    if not pdf_available(settings):
+        raise ApiError(
+            503,
+            "pdf_unavailable",
+            "PDF export is unavailable on this machine. Install LibreOffice to enable it.",
+        )
+    try:
+        generated = export_pdf(record.artifacts["formatted"], workspaces.path(record.id), settings)
+    except PdfExportError as exc:
+        if exc.unavailable:
+            raise ApiError(503, "pdf_unavailable", exc.message) from None
+        raise ApiError(500, "export_failed", "The PDF could not be generated.") from None
+
+    target = workspaces.path(record.id, _export_basename(record, "pdf"))
+    if Path(generated) != target:
+        shutil.copyfile(generated, target)
+    record.artifacts["export_pdf"] = target
+    record.state = "exported"
+    store.update(record)
+    return FileResponse(str(target), media_type="application/pdf", filename=target.name)
+
+
+@router.get("/{doc_id}/preview")
+def preview_document(
+    doc_id: str,
+    settings: Settings = Depends(get_settings_dep),
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+):
+    record = _require_formatted(store, doc_id)
+
+    if pdf_available(settings):
+        cached = record.artifacts.get("preview_pdf")
+        try:
+            if cached is None or not Path(cached).exists():
+                cached = export_pdf(
+                    record.artifacts["formatted"], workspaces.path(record.id), settings
+                )
+                record.artifacts["preview_pdf"] = cached
+                store.update(record)
+            return FileResponse(str(cached), media_type="application/pdf")
+        except PdfExportError:
+            pass  # fall through to the structured preview
+
+    label = (record.profile_id or "ieee").upper()
+    return HTMLResponse(content=render_structured_html(record.manuscript, label))
+
+
+@router.delete("/{doc_id}", status_code=204)
+def delete_document(
+    doc_id: str,
+    store: DocumentStore = Depends(get_store),
+    workspaces: WorkspaceManager = Depends(get_workspaces),
+) -> None:
+    _require(store, doc_id)
+    workspaces.delete(doc_id)
+    store.delete(doc_id)
