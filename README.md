@@ -32,7 +32,12 @@ export a verified DOCX or PDF.
 - **Export** — verified DOCX; PDF via headless LibreOffice when available, with a
   clear "unavailable" state otherwise. Structural HTML preview as a fallback.
 - **Workspace** — interactive outline, metadata editor, element list with inline
-  reclassification, issue center with severity filters, before/after summary.
+  reclassification, issue center with severity filters, before/after comparison
+  (structural + metadata deltas), and a document-statistics panel.
+- **Local document history** — a SQLite log (`./.workspace/history.db`) of every
+  document's lifecycle: filename, date, profile, state, health, counts. **No
+  manuscript content is stored.** Drives the dashboard "recent manuscripts" list;
+  rows are deletable. Disable with `HISTORY_ENABLED=false`.
 
 The product never claims a document is "IEEE compliant" — it reports *"IEEE
 format profile applied"* and *"IEEE validation checks passed"* for the checks it
@@ -115,8 +120,10 @@ python scripts/gen_rules_doc.py   # regenerates docs/RULES.md from the profile Y
 
 | Profile | Status | Notes |
 |---|---|---|
-| IEEE | Available | Two-column US Letter, 10 pt Times body, roman-numeral headings, `Abstract—` / `Index Terms—` blocks, bracketed `[n]` references. See `docs/RULES.md` for every rule's provenance. |
-| Springer | Planned | Listed in the UI as planned; `POST /format` returns 422 until its profile ships. |
+| IEEE | Available | Two-column US Letter, 10 pt Times body, roman-numeral headings, `Abstract—` / `Index Terms—` blocks, bracketed `[n]` references. |
+| Springer | Available | One generic single-column A4 profile with decimal-numbered headings and bracketed references. **Not** a specific journal or LNCS template — most rules are marked `inferred`/`configurable`; template variants can be added as more YAML. |
+
+See `docs/RULES.md` for every rule's provenance in both profiles.
 
 ## Known limitations
 
@@ -126,15 +133,15 @@ python scripts/gen_rules_doc.py   # regenerates docs/RULES.md from the profile Y
 - Oversize tables and figures are **flagged**, never resized.
 - Equations, footnotes, hyperlinks, and field codes are preserved as-is, not
   reformatted.
-- Document history / dashboard "recent" list, a visual before/after diff, and a
-  Springer profile are not in this release.
-- The `DocumentStore` is in-process: state is lost when the backend restarts
-  (working files persist on disk until the TTL sweep).
+- The `DocumentStore` is in-process: a document's live working session is lost when
+  the backend restarts (its history row survives; re-upload to work on it again).
+  Working files persist on disk until the TTL sweep.
+- Springer is one generic profile, not per-journal templates.
 
 ## Future extension points
 
-- SQLite-backed `DocumentStore` for local history (no pipeline changes).
-- Additional publisher profiles as YAML.
+- Additional publisher profiles (and Springer template variants) as YAML.
+- Full session persistence so a document's workspace survives a backend restart.
 - Optional ML assist behind the existing confidence-returning interfaces.
 
 ## License

@@ -21,12 +21,12 @@ docs/       this file, RULES.md, superpowers/ specs + plans
 | `api/` | HTTP routers only. Handlers parse, delegate, serialize. Uniform `ApiError` envelope. |
 | `schemas/` | Pydantic DTOs — the wire format, kept separate from the domain model. |
 | `domain/` | Pure-data model: `Manuscript`, `Block`, `Metadata`/`Field`, `Issue`, `HealthScore`, `AnalysisProgress`. No I/O. |
-| `storage/` | `DocumentStore` ABC + `InMemoryDocumentStore`; `WorkspaceManager` (per-uuid dirs, traversal-safe, TTL sweep). SQLite would be a second `DocumentStore`. |
+| `storage/` | `DocumentStore` ABC + `InMemoryDocumentStore` (live session state); `WorkspaceManager` (per-uuid dirs, traversal-safe, TTL sweep); `HistoryStore` ABC + `SqliteHistoryStore` / `InMemoryHistoryStore` — a **log-only** history of each document's lifecycle (no manuscript content), written at every transition. |
 | `ingestion/` | Upload validation (magic bytes, ZIP structure, zip-bomb + traversal guards) and intake to a workspace. |
 | `parsing/` | `parse_docx` → ordered `ParsedBlock` stream (python-docx + raw OOXML). Read-only; one bad element becomes a warning, not a crash. |
 | `extraction/` | Rule-based metadata heuristics (title/authors/affiliations/abstract/keywords) with confidence. |
 | `classification/` | Per-block `ElementType` cascade + canonical section detection + outline tree. |
-| `analysis/` | `run_analysis` — the staged pipeline; `corrections` — user overrides. |
+| `analysis/` | `run_analysis` — the staged pipeline; `corrections` — user overrides; `stats` — shared count helper; `comparison` — re-parses the formatted DOCX and diffs it against the in-memory `Manuscript` (structural + metadata, not pixel-perfect). |
 | `profiles/` | `PublisherProfile` model + YAML loader; every rule group tagged `implemented / configurable / inferred / unsupported`. `rules_doc` renders `docs/RULES.md`. |
 | `formatting/` | The engine: work on a **copy**, `ensure_styles` + `apply_page_layout`, `restyle_body`, `style_tables`, `check_figures`, then `rebuild_frontmatter` (the only regeneration). `run` orchestrates format + validate for the API. |
 | `validation/` | Categorized `validate()`, `check_references`, `check_preservation` (body-text hash outside the front-matter boundary), `score` (weighted health). |
@@ -58,6 +58,6 @@ Each stage is independently testable (`backend/tests/{unit,integration,api}`).
 
 ## Extension points
 
-- **Storage / history** — implement `DocumentStore` against SQLite; the pipeline is untouched.
-- **New publisher profile** — add `profiles/data/<id>.yaml`; `list_profiles` and the formatting engine pick it up. Springer is listed as `planned` until its YAML ships.
+- **History** — `HistoryStore` is an ABC; `SqliteHistoryStore` is one implementation. Swap it (Postgres, a remote log) without touching the pipeline. It never holds manuscript content.
+- **New publisher profile** — add `profiles/data/<id>.yaml`; `list_profiles`, `gen_rules_doc`, and the formatting engine pick it up automatically. IEEE and Springer both ship.
 - **ML assist** — classification/extraction are pure functions returning confidences; a model could supplement the rule cascade behind the same interface.
