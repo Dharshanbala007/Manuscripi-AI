@@ -4,6 +4,7 @@ import { ApiError, api } from "../lib/api";
 import type {
   AnalysisOut,
   ChangeLogOut,
+  ComparisonOut,
   ElementOut,
   FormatOut,
   HealthScoreOut,
@@ -19,11 +20,13 @@ import type {
 export interface WorkspaceState {
   loading: boolean;
   error: string | null;
+  notFound: boolean;
   docState: string;
   filename: string;
   profileId: string | null;
   metadata: MetadataOut | null;
   stats: StatsOut | null;
+  pageCount: number | null;
   outline: OutlineNode[];
   elements: ElementOut[];
   issues: IssueOut[];
@@ -32,16 +35,20 @@ export interface WorkspaceState {
   preservation: PreservationOut | null;
   parseWarnings: string[];
   pdfExport: boolean;
+  comparison: ComparisonOut | null;
+  comparisonLoading: boolean;
 }
 
 const EMPTY: WorkspaceState = {
   loading: true,
   error: null,
+  notFound: false,
   docState: "analyzed",
   filename: "",
   profileId: null,
   metadata: null,
   stats: null,
+  pageCount: null,
   outline: [],
   elements: [],
   issues: [],
@@ -50,6 +57,8 @@ const EMPTY: WorkspaceState = {
   preservation: null,
   parseWarnings: [],
   pdfExport: false,
+  comparison: null,
+  comparisonLoading: false,
 };
 
 function applyAnalysis(prev: WorkspaceState, a: AnalysisOut): WorkspaceState {
@@ -59,6 +68,7 @@ function applyAnalysis(prev: WorkspaceState, a: AnalysisOut): WorkspaceState {
     profileId: a.profile_id,
     metadata: a.metadata,
     stats: a.stats,
+    pageCount: a.page_count,
     issues: a.issues,
     health: a.health,
     changeLog: a.change_log,
@@ -79,7 +89,7 @@ export function useWorkspace(id: string) {
   }, [id]);
 
   const reload = useCallback(async () => {
-    setS((prev) => ({ ...prev, loading: true, error: null }));
+    setS((prev) => ({ ...prev, loading: true, error: null, notFound: false }));
     try {
       const [doc, analysis, health] = await Promise.all([
         api.getDocument(id),
@@ -90,15 +100,22 @@ export function useWorkspace(id: string) {
         ...applyAnalysis(prev, analysis),
         loading: false,
         error: null,
+        notFound: false,
         filename: doc.filename,
         pdfExport: health.capabilities.pdf_export,
       }));
       await loadStructure();
     } catch (err) {
+      const notFound = err instanceof ApiError && err.status === 404;
       setS((prev) => ({
         ...prev,
         loading: false,
-        error: err instanceof ApiError ? err.message : "Could not load the workspace.",
+        notFound,
+        error: notFound
+          ? "This working session has ended. Upload the document again to continue."
+          : err instanceof ApiError
+            ? err.message
+            : "Could not load the workspace.",
       }));
     }
   }, [id, loadStructure]);
@@ -138,6 +155,7 @@ export function useWorkspace(id: string) {
         health: result.health,
         changeLog: result.change_log,
         preservation: result.preservation,
+        comparison: null, // stale after re-formatting
       }));
       return result;
     },
@@ -156,5 +174,23 @@ export function useWorkspace(id: string) {
     return result;
   }, [id]);
 
-  return { ...s, reload, saveMetadata, reclassify, applyFormat, runValidate };
+  const loadComparison = useCallback(async () => {
+    setS((prev) => ({ ...prev, comparisonLoading: true }));
+    try {
+      const comparison = await api.getComparison(id);
+      setS((prev) => ({ ...prev, comparison, comparisonLoading: false }));
+    } catch {
+      setS((prev) => ({ ...prev, comparisonLoading: false }));
+    }
+  }, [id]);
+
+  return {
+    ...s,
+    reload,
+    saveMetadata,
+    reclassify,
+    applyFormat,
+    runValidate,
+    loadComparison,
+  };
 }

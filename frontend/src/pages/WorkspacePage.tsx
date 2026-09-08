@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { ComparePanel } from "../components/workspace/ComparePanel";
+import { ElementsList } from "../components/workspace/ElementsList";
 import { ExportBar } from "../components/workspace/ExportBar";
 import { FormatPicker } from "../components/workspace/FormatPicker";
 import { HealthCard } from "../components/workspace/HealthCard";
 import { IssuesPanel } from "../components/workspace/IssuesPanel";
 import { MetadataEditor } from "../components/workspace/MetadataEditor";
-import { ElementsList } from "../components/workspace/ElementsList";
 import { OutlinePanel } from "../components/workspace/OutlinePanel";
 import { PreviewPane } from "../components/workspace/PreviewPane";
+import { StatsPanel } from "../components/workspace/StatsPanel";
 import { TopBar } from "../components/workspace/TopBar";
 import { WhatChanged } from "../components/workspace/WhatChanged";
 import { Button } from "../components/ui/Button";
@@ -20,7 +22,7 @@ import { ApiError } from "../lib/api";
 import { useDocumentFlow } from "../state/useDocumentFlow";
 import { useWorkspace } from "../workspace/useWorkspace";
 
-type CenterTab = "review" | "preview" | "changes";
+type CenterTab = "review" | "preview" | "changes" | "compare";
 
 const FORMATTED_STATES = ["formatted", "validated", "exported"];
 
@@ -46,6 +48,11 @@ export function WorkspacePage() {
         .querySelector(`[data-block-id="${blockId}"]`)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
+  }
+
+  function openCompare() {
+    setCenterTab("compare");
+    if (!ws.comparison && formatted) void ws.loadComparison();
   }
 
   async function applyFormat(profileId: string) {
@@ -90,9 +97,11 @@ export function WorkspacePage() {
   if (ws.error) {
     return (
       <ErrorState
-        title="Could not load the workspace"
+        title={ws.notFound ? "Session ended" : "Could not load the workspace"}
         description={ws.error}
-        action={<Button onClick={() => navigate("/")}>Back to dashboard</Button>}
+        action={<Button onClick={() => navigate(ws.notFound ? "/upload" : "/")}>
+          {ws.notFound ? "Upload a manuscript" : "Back to dashboard"}
+        </Button>}
       />
     );
   }
@@ -126,16 +135,18 @@ export function WorkspacePage() {
         <div className="flex flex-col gap-4">
           <Tabs
             active={centerTab}
-            onChange={(t) => setCenterTab(t as CenterTab)}
+            onChange={(t) => (t === "compare" ? openCompare() : setCenterTab(t as CenterTab))}
             items={[
               { id: "review", label: "Review" },
               { id: "preview", label: "Preview" },
               { id: "changes", label: "What changed" },
+              { id: "compare", label: "Compare" },
             ]}
           />
 
           {centerTab === "review" && ws.metadata ? (
             <>
+              {ws.stats ? <StatsPanel stats={ws.stats} pageCount={ws.pageCount} /> : null}
               <MetadataEditor metadata={ws.metadata} onSave={ws.saveMetadata} />
               <ElementsList elements={ws.elements} onReclassify={ws.reclassify} />
             </>
@@ -160,6 +171,15 @@ export function WorkspacePage() {
                 </Card>
               ) : null}
             </>
+          ) : null}
+
+          {centerTab === "compare" ? (
+            <ComparePanel
+              comparison={ws.comparison}
+              loading={ws.comparisonLoading}
+              ready={formatted}
+              onLoad={ws.loadComparison}
+            />
           ) : null}
         </div>
 
