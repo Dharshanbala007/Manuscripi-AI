@@ -65,7 +65,7 @@ export function RecentList({ limit = 8 }: { limit?: number }) {
             <FileText className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm text-zinc-800">{entry.filename}</span>
-              <span className="text-[11px] text-zinc-400">{shortDate(entry.updated_at)}</span>
+              <span className="text-[11px] text-zinc-500">{shortDate(entry.updated_at)}</span>
             </span>
             {entry.profile_id ? <Badge tone="neutral">{entry.profile_id.toUpperCase()}</Badge> : null}
             <Badge tone="muted">{titleCase(entry.state)}</Badge>

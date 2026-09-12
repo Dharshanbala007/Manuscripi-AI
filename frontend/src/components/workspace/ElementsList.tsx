@@ -65,12 +65,12 @@ export function ElementsList({
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-zinc-800">
-                  {el.text_preview || <span className="italic text-zinc-400">[no text]</span>}
+                  {el.text_preview || <span className="italic text-zinc-500">[no text]</span>}
                 </p>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <Badge tone="neutral">{titleCase(el.kind)}</Badge>
                   {el.level ? <Badge tone="muted">L{el.level}</Badge> : null}
-                  <span className="text-[11px] tabular-nums text-zinc-400">
+                  <span className="text-[11px] tabular-nums text-zinc-500">
                     {Math.round(el.confidence * 100)}%
                   </span>
                   {el.needs_review ? <Badge tone="warning">needs review</Badge> : null}

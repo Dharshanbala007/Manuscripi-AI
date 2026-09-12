@@ -166,6 +166,7 @@ export function MetadataEditor({
             />
           </div>
           <TextArea
+            aria-label="Abstract"
             value={draft.abstract}
             onChange={(e) => setDraft({ ...draft, abstract: e.target.value })}
             rows={4}

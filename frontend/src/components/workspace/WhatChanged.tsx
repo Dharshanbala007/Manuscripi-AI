@@ -29,7 +29,7 @@ export function WhatChanged({
       <CardHeader title="What changed" description={`${changeLog.warnings_remaining} warnings remaining`} />
       <CardBody className="flex flex-col gap-4">
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
             Formatting changes
           </h3>
           <ul className="mt-2 flex flex-col gap-1.5 text-sm text-zinc-700">

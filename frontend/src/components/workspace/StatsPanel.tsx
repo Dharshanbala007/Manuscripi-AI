@@ -24,7 +24,7 @@ export function StatsPanel({
           {items.map(([label, value]) => (
             <div key={label} className="text-center">
               <dd className="text-lg font-semibold tabular-nums text-zinc-900">{value}</dd>
-              <dt className="text-[11px] uppercase tracking-wide text-zinc-400">{label}</dt>
+              <dt className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</dt>
             </div>
           ))}
         </dl>

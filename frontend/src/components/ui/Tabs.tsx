@@ -30,12 +30,12 @@ export function Tabs({
             className={cn(
               "rounded-md font-medium transition-colors",
               size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-sm",
-              selected ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800",
+              selected ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-800",
             )}
           >
             {item.label}
             {item.count !== undefined ? (
-              <span className={cn("ml-1.5 tabular-nums", selected ? "text-zinc-400" : "text-zinc-400")}>
+              <span className="ml-1.5 tabular-nums text-zinc-600">
                 {item.count}
               </span>
             ) : null}

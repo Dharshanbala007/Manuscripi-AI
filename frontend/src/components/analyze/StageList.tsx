@@ -31,7 +31,7 @@ export function StageList({ stages }: { stages: StageOut[] }) {
                 "text-sm",
                 stage.status === "done" && "text-zinc-700",
                 stage.status === "active" && "font-medium text-zinc-900",
-                stage.status === "pending" && "text-zinc-400",
+                stage.status === "pending" && "text-zinc-500",
               )}
             >
               {stage.label}

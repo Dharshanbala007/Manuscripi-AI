@@ -34,7 +34,7 @@ export function HealthCard({ health }: { health: HealthScoreOut | null }) {
           <span className={cn("text-4xl font-semibold tabular-nums", toneFor(health.total))}>
             {health.total}
           </span>
-          <span className="text-sm text-zinc-400">/ 100</span>
+          <span className="text-sm text-zinc-500">/ 100</span>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -42,7 +42,7 @@ export function HealthCard({ health }: { health: HealthScoreOut | null }) {
             <div key={name}>
               <div className="flex items-center justify-between text-xs text-zinc-600">
                 <span>{name}</span>
-                <span className="tabular-nums text-zinc-400">{score}</span>
+                <span className="tabular-nums text-zinc-500">{score}</span>
               </div>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
                 <div className={cn("h-full rounded-full", barFor(score))} style={{ width: `${score}%` }} />
@@ -53,7 +53,7 @@ export function HealthCard({ health }: { health: HealthScoreOut | null }) {
 
         {topContributors.length > 0 ? (
           <div className="border-t border-zinc-100 pt-3">
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
               Affecting the score
             </p>
             <ul className="flex flex-col gap-1 text-xs text-zinc-600">

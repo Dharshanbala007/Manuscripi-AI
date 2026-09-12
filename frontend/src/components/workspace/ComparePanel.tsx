@@ -75,7 +75,7 @@ export function ComparePanel({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wide text-zinc-400">
+              <tr className="text-left text-[11px] uppercase tracking-wide text-zinc-500">
                 <th className="py-1 font-medium">Element</th>
                 <th className="py-1 font-medium">Original</th>
                 <th className="py-1 font-medium">Formatted</th>
@@ -122,7 +122,7 @@ function MetaBlock({
 }) {
   return (
     <div className="rounded-lg border border-zinc-200 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
       <dl className="mt-2 flex flex-col gap-1 text-xs">
         <Row label="Title" value={meta.title || "—"} />
         <Row label="Authors" value={meta.authors.join(", ") || "—"} />
@@ -137,7 +137,7 @@ function MetaBlock({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-2">
-      <dt className="w-16 shrink-0 text-zinc-400">{label}</dt>
+      <dt className="w-16 shrink-0 text-zinc-500">{label}</dt>
       <dd className="min-w-0 flex-1 truncate text-zinc-700" title={value}>
         {value}
       </dd>

@@ -29,7 +29,7 @@ test.describe("Upload", () => {
     await page.goto("/upload");
     await simulateFileDrop(
       page,
-      '[role="button"][aria-label*="Drop your manuscript"]',
+      '[data-testid="dropzone"]',
       path.join(SAMPLES, "sample_complex.docx"),
       "sample_complex.docx",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

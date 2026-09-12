@@ -51,7 +51,7 @@ export function TopBar({
         >
           <ListChecks className="h-3.5 w-3.5" /> Validate
         </Button>
-        <span className="hidden items-center gap-1 text-xs text-zinc-400 sm:flex">
+        <span className="hidden items-center gap-1 text-xs text-zinc-500 sm:flex">
           <FileCheck2 className="h-3.5 w-3.5" /> local
         </span>
       </div>

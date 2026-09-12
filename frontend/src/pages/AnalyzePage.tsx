@@ -113,7 +113,7 @@ function StatsRow({ stats }: { stats: StatsOut }) {
       {items.map(([label, value]) => (
         <div key={label} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-center">
           <div className="text-lg font-semibold tabular-nums text-zinc-900">{value}</div>
-          <div className="text-[11px] uppercase tracking-wide text-zinc-400">{label}</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</div>
         </div>
       ))}
     </div>

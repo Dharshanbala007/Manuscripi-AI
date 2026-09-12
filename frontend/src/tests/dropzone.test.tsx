@@ -54,13 +54,13 @@ describe("<Dropzone />", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(/larger than/i);
   });
 
-  it("opens the file picker on Enter", () => {
+  it("associates the visible label with the file input for accessible activation", () => {
     render(<Dropzone onAccept={vi.fn()} maxMb={25} />);
     const input = screen.getByTestId("dropzone-input") as HTMLInputElement;
-    const clickSpy = vi.spyOn(input, "click").mockImplementation(() => {});
-    fireEvent.keyDown(screen.getByRole("button", { name: /drop your manuscript/i }), {
-      key: "Enter",
-    });
-    expect(clickSpy).toHaveBeenCalled();
+    const label = screen.getByTestId("dropzone");
+    // Native <label for>/<input id> association is what makes clicking anywhere
+    // in the label, or pressing Enter/Space while the input is focused, open
+    // the file picker in a real browser — no custom keyboard handler needed.
+    expect(label.getAttribute("for")).toBe(input.id);
   });
 });

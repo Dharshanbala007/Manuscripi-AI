@@ -87,7 +87,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => remove(toast.id)}
-                className="text-zinc-400 hover:text-zinc-700"
+                className="text-zinc-500 hover:text-zinc-700"
                 aria-label="Dismiss notification"
               >
                 ×

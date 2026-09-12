@@ -20,7 +20,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
-      <footer className="border-t border-zinc-200 px-4 py-4 text-center text-xs text-zinc-400">
+      <footer className="border-t border-zinc-200 px-4 py-4 text-center text-xs text-zinc-500">
         ManuScript AI · rule-based, offline-capable · IEEE format profile
       </footer>
     </div>

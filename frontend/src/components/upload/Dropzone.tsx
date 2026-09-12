@@ -1,5 +1,5 @@
 import { UploadCloud } from "lucide-react";
-import { type DragEvent, useRef, useState } from "react";
+import { type DragEvent, useId, useRef, useState } from "react";
 
 import { cn } from "../../lib/cn";
 import { humanBytes } from "../../lib/format";
@@ -34,6 +34,7 @@ export function Dropzone({
   disabled?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,18 +59,9 @@ export function Dropzone({
 
   return (
     <div className="flex flex-col gap-3">
-      <div
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        aria-disabled={disabled}
-        aria-label="Drop your manuscript here or press Enter to browse files"
-        onClick={() => !disabled && inputRef.current?.click()}
-        onKeyDown={(e) => {
-          if (!disabled && (e.key === "Enter" || e.key === " ")) {
-            e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
+      <label
+        htmlFor={inputId}
+        data-testid="dropzone"
         onDragOver={(e) => {
           e.preventDefault();
           if (!disabled) setDragging(true);
@@ -78,7 +70,7 @@ export function Dropzone({
         onDrop={onDrop}
         className={cn(
           "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors",
-          disabled && "cursor-not-allowed opacity-50",
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
           dragging
             ? "border-accent bg-accent-soft"
             : "border-zinc-300 bg-white hover:border-zinc-400",
@@ -96,6 +88,7 @@ export function Dropzone({
         </span>
         <input
           ref={inputRef}
+          id={inputId}
           data-testid="dropzone-input"
           type="file"
           accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -103,7 +96,7 @@ export function Dropzone({
           onChange={(e) => handleFiles(e.target.files)}
           disabled={disabled}
         />
-      </div>
+      </label>
       {error ? (
         <p role="alert" className="text-xs text-red-600">
           {error}{" "}
