@@ -21,7 +21,7 @@ export a verified DOCX or PDF.
   Results, Discussion, Conclusion, References, Appendix, plus common synonyms.
 - **Publisher profiles** — configurable YAML; every rule tagged
   *implemented / configurable / inferred / unsupported* (see `docs/RULES.md`).
-  **IEEE** ships; **Springer** is listed as *planned*.
+  **IEEE** and **Springer** both ship as available profiles.
 - **Formatting engine** — works on a copy: named styles, page geometry and
   columns, body restyle (emphasis preserved), table/figure checks, and a
   front-matter rebuild from your reviewed metadata.
@@ -38,6 +38,10 @@ export a verified DOCX or PDF.
   document's lifecycle: filename, date, profile, state, health, counts. **No
   manuscript content is stored.** Drives the dashboard "recent manuscripts" list;
   rows are deletable. Disable with `HISTORY_ENABLED=false`.
+- **Accessibility** — semantic landmarks, keyboard-operable upload and dialogs
+  (with a real focus trap), visible focus rings, `aria-live` status/toast
+  regions, and WCAG AA text contrast — verified by an automated axe scan plus
+  a manual keyboard-navigation pass in the Playwright suite.
 
 The product never claims a document is "IEEE compliant" — it reports *"IEEE
 format profile applied"* and *"IEEE validation checks passed"* for the checks it
@@ -58,7 +62,7 @@ processing state machine.
 | Backend | Python 3.12, FastAPI, python-docx, Pydantic v2, Uvicorn, pypdf, PyYAML |
 | PDF | headless LibreOffice (`soffice`) — local, optional |
 | Frontend | React 18, TypeScript, Vite 5, Tailwind 3, lucide-react |
-| Tests | pytest (unit / integration / API), vitest (state machine, api client, components) |
+| Tests | pytest (unit / integration / API), vitest (state machine, api client, components), Playwright + axe-core (end-to-end, accessibility) |
 
 ## Setup
 
@@ -102,12 +106,20 @@ API docs: `http://localhost:8000/docs`.
 ## Tests
 
 ```bash
-bash scripts/check.sh        # ruff + pytest + tsc + vitest
+bash scripts/check.sh        # ruff + pytest + tsc + vitest + playwright
 
 # or individually
 cd backend  && .venv/Scripts/python -m pytest
 cd frontend && npm test && npx tsc -b --noEmit
+cd frontend && npx playwright test    # end-to-end (Chromium) — starts both servers automatically
 ```
+
+The Playwright suite (`frontend/e2e/`) drives the real application against an
+isolated backend (its own port, a temp `WORK_DIR`/`HISTORY_DB`) — no mocking.
+It covers upload, analysis, metadata review, IEEE/Springer formatting,
+validation, preview, comparison, export, error recovery, responsive layouts,
+and an automated accessibility scan (`@axe-core/playwright`) on every major
+screen.
 
 ## Sample documents
 
