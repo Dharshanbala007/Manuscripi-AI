@@ -22,6 +22,8 @@ backend/.workspace/
 
 # Test tooling
 .playwright-mcp/
+frontend/playwright-report/
+frontend/test-results/
 
 # Env
 .env

@@ -16,5 +16,7 @@ echo "== frontend: tsc =="
 ( cd "$ROOT/frontend" && npx tsc -b --noEmit )
 echo "== frontend: vitest =="
 ( cd "$ROOT/frontend" && npm test )
+echo "== frontend: playwright e2e =="
+( cd "$ROOT/frontend" && npx playwright test )
 
 echo "All checks passed."
