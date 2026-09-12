@@ -41,6 +41,10 @@ export default defineConfig({
       env: {
         WORK_DIR: path.join(workDir, "workspace"),
         HISTORY_DB: path.join(workDir, "history.db"),
+        CORS_ORIGINS: JSON.stringify([
+          `http://localhost:${FRONTEND_PORT}`,
+          `http://127.0.0.1:${FRONTEND_PORT}`,
+        ]),
       },
     },
     {
