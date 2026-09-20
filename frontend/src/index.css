@@ -49,9 +49,9 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(48rem 32rem at 8% -6%, hsl(243 95% 88% / 0.55), transparent 62%),
-      radial-gradient(42rem 30rem at 96% 2%, hsl(199 95% 86% / 0.45), transparent 58%),
-      radial-gradient(40rem 28rem at 58% 106%, hsl(280 85% 90% / 0.4), transparent 62%);
+      radial-gradient(52rem 36rem at 6% -8%, hsl(243 95% 80% / 0.6), transparent 64%),
+      radial-gradient(46rem 34rem at 98% 4%, hsl(199 95% 76% / 0.5), transparent 60%),
+      radial-gradient(44rem 30rem at 55% 108%, hsl(283 90% 82% / 0.45), transparent 64%);
     animation: aurora 22s ease-in-out infinite;
   }
 }

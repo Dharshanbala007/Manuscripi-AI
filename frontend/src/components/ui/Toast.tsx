@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle2, Info, XCircle } from "lucide-react";
 import {
   createContext,
@@ -72,29 +73,36 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         aria-live="polite"
         aria-label="Notifications"
       >
-        {toasts.map((toast) => {
-          const Icon = ICON[toast.tone];
-          return (
-            <div
-              key={toast.id}
-              className={cn(
-                "pointer-events-auto flex items-start gap-2 rounded-lg border bg-white px-3 py-2 text-sm shadow-raised",
-                TONE_CLASS[toast.tone],
-              )}
-            >
-              <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="flex-1">{toast.message}</span>
-              <button
-                type="button"
-                onClick={() => remove(toast.id)}
-                className="text-zinc-500 hover:text-zinc-700"
-                aria-label="Dismiss notification"
+        <AnimatePresence initial={false}>
+          {toasts.map((toast) => {
+            const Icon = ICON[toast.tone];
+            return (
+              <motion.div
+                key={toast.id}
+                layout
+                initial={{ opacity: 0, y: 20, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 24, scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                className={cn(
+                  "pointer-events-auto flex items-start gap-2 rounded-xl border bg-white/90 px-3 py-2 text-sm shadow-raised backdrop-blur-xl",
+                  TONE_CLASS[toast.tone],
+                )}
               >
-                ×
-              </button>
-            </div>
-          );
-        })}
+                <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="flex-1">{toast.message}</span>
+                <button
+                  type="button"
+                  onClick={() => remove(toast.id)}
+                  className="text-zinc-500 hover:text-zinc-700"
+                  aria-label="Dismiss notification"
+                >
+                  ×
+                </button>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );

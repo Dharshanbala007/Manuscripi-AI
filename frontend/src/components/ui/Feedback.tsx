@@ -32,7 +32,7 @@ export function Progress({ value, label }: { value: number; label?: string }) {
       aria-valuemax={100}
       aria-label={label}
     >
-      <div className="h-full rounded-full bg-primary transition-[width] duration-500" style={{ width: `${pct}%` }} />
+      <div className="h-full rounded-full bg-gradient-to-r from-primary to-violet-500 transition-[width] duration-500" style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -49,7 +49,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-zinc-300 bg-white/60 px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300/80 bg-white/50 px-6 py-10 text-center">
       {Icon ? <Icon className="h-6 w-6 text-zinc-400" aria-hidden="true" /> : null}
       <p className="text-sm font-medium text-zinc-700">{title}</p>
       {description ? <p className="max-w-sm text-xs text-zinc-500">{description}</p> : null}

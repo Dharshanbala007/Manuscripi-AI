@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { ArrowRight, FileText, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +10,12 @@ import { Card, CardBody, CardHeader } from "../components/ui/Card";
 import { api } from "../lib/api";
 import type { ProfileSummary } from "../lib/types";
 
+const STAGGER = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const RISE = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 28 } },
+} as const;
+
 export function DashboardPage() {
   const navigate = useNavigate();
   const [formats, setFormats] = useState<ProfileSummary[]>([]);
@@ -18,25 +25,33 @@ export function DashboardPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col items-start gap-4">
+    <motion.div className="flex flex-col gap-8" variants={STAGGER} initial="hidden" animate="show">
+      <motion.section variants={RISE} className="flex flex-col items-start gap-4">
         <Badge tone="accent">
           <Sparkles className="h-3 w-3" /> Rule-based · offline-capable
         </Badge>
-        <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-zinc-900">
-          Turn a raw manuscript into a publication-ready document.
+        <h1 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-900">
+          Turn a raw manuscript into a{" "}
+          <span className="relative whitespace-nowrap">
+            publication-ready
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 bottom-0.5 -z-10 h-2.5 rounded-full bg-gradient-to-r from-primary/30 to-violet-400/30"
+            />
+          </span>{" "}
+          document.
         </h1>
         <p className="max-w-2xl text-sm text-zinc-600">
           Upload an unformatted Word <code className="rounded bg-zinc-100 px-1">.docx</code>. ManuScript
           AI analyses its structure, applies a publisher format profile, validates the result, and
           exports a verified DOCX or PDF — all on this machine.
         </p>
-        <Button onClick={() => navigate("/upload")} className="mt-1">
-          New manuscript <ArrowRight className="h-4 w-4" />
+        <Button onClick={() => navigate("/upload")} className="mt-1 h-10 px-5 text-sm shadow-glow">
+          New manuscript <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Button>
-      </section>
+      </motion.section>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <motion.div variants={RISE} className="grid gap-5 md:grid-cols-2">
         <Card>
           <CardHeader title="Supported publication formats" />
           <CardBody className="flex flex-col gap-3">
@@ -68,18 +83,20 @@ export function DashboardPage() {
             <Step icon={Lock} text="Private — processing runs locally; nothing is uploaded to any external service." />
           </CardBody>
         </Card>
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardHeader
-          title="Recent manuscripts"
-          description="Local history — stored on this machine, no manuscript content."
-        />
-        <CardBody>
-          <RecentList />
-        </CardBody>
-      </Card>
-    </div>
+      <motion.div variants={RISE}>
+        <Card>
+          <CardHeader
+            title="Recent manuscripts"
+            description="Local history — stored on this machine, no manuscript content."
+          />
+          <CardBody>
+            <RecentList />
+          </CardBody>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }
 

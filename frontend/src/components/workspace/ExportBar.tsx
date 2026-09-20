@@ -1,6 +1,7 @@
 import { Download, FileText } from "lucide-react";
 
 import { api } from "../../lib/api";
+import { useFlowStage } from "../../state/flowStage";
 import { useToast } from "../ui/Toast";
 import { MorphButton } from "../ui/MorphButton";
 
@@ -39,6 +40,7 @@ export function ExportBar({
   pdfExport: boolean;
 }) {
   const toast = useToast();
+  const { setWorkspaceStage } = useFlowStage();
   const base = `manuscript_${profileId ?? "ieee"}_formatted`;
 
   async function run(kind: "docx" | "pdf") {
@@ -48,6 +50,7 @@ export function ExportBar({
         `${base}.${kind}`,
       );
       toast.success(`${kind.toUpperCase()} exported.`);
+      setWorkspaceStage(4);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Export failed.");
       throw err;

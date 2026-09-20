@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { UploadCloud } from "lucide-react";
 import { type DragEvent, useId, useRef, useState } from "react";
 
@@ -69,21 +70,30 @@ export function Dropzone({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors",
+          "group flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all duration-200",
           disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
           dragging
-            ? "border-primary bg-accent"
-            : "border-zinc-300 bg-white hover:border-zinc-400",
+            ? "scale-[1.015] border-primary bg-accent shadow-[0_0_0_6px_hsl(var(--primary)/0.10)]"
+            : "border-primary/30 bg-white/50 hover:border-primary/60 hover:bg-white/80",
         )}
       >
-        <span className="grid h-11 w-11 place-items-center rounded-full bg-accent text-primary">
-          <UploadCloud className="h-5 w-5" aria-hidden="true" />
-        </span>
+        <motion.span
+          aria-hidden="true"
+          className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent to-white text-primary shadow-glass"
+          animate={{ y: dragging ? -6 : [0, -4, 0] }}
+          transition={
+            dragging
+              ? { type: "spring", stiffness: 400, damping: 20 }
+              : { repeat: Infinity, duration: 2.6, ease: "easeInOut" }
+          }
+        >
+          <UploadCloud className="h-5 w-5" />
+        </motion.span>
         <div>
           <p className="text-sm font-medium text-zinc-800">Drop your manuscript here</p>
           <p className="mt-0.5 text-xs text-zinc-500">Upload a .DOCX file to begin</p>
         </div>
-        <span className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700">
+        <span className="rounded-[9px] border border-border bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 shadow-sm transition-colors group-hover:bg-zinc-50">
           Browse files
         </span>
         <input

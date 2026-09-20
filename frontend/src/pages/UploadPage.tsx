@@ -1,9 +1,10 @@
+import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { StageSurface } from "../components/layout/StageSurface";
 import { Button } from "../components/ui/Button";
-import { Card, CardBody } from "../components/ui/Card";
 import { Spinner } from "../components/ui/Feedback";
 import { useToast } from "../components/ui/Toast";
 import { Dropzone } from "../components/upload/Dropzone";
@@ -13,6 +14,13 @@ import type { DocumentOut } from "../lib/types";
 import { useDocumentFlow } from "../state/useDocumentFlow";
 
 const MAX_MB = 25;
+
+const SWAP = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
+  transition: { duration: 0.2 },
+} as const;
 
 export function UploadPage() {
   const navigate = useNavigate();
@@ -43,7 +51,7 @@ export function UploadPage() {
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <Link to="/" className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800">
+      <Link to="/" className="inline-flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-900">
         <ArrowLeft className="h-3.5 w-3.5" /> Back to dashboard
       </Link>
 
@@ -55,40 +63,40 @@ export function UploadPage() {
         </p>
       </div>
 
-      {doc ? (
-        <Card>
-          <CardBody className="flex items-center gap-4">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent text-primary">
-              <FileText className="h-5 w-5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-zinc-900">{doc.filename}</p>
-              <p className="text-xs text-zinc-500">
-                {humanBytes(doc.size)} · uploaded
-              </p>
-            </div>
-            <Button
-              onClick={() => {
-                flow.goto("ANALYZING");
-                navigate(`/analyze/${doc.id}`);
-              }}
-            >
-              Analyse manuscript <ArrowRight className="h-4 w-4" />
-            </Button>
-          </CardBody>
-        </Card>
-      ) : (
-        <div className="relative">
-          <Dropzone onAccept={handleAccept} maxMb={MAX_MB} disabled={busy} />
-          {busy ? (
-            <div className="absolute inset-0 grid place-items-center rounded-2xl bg-white/70">
-              <span className="inline-flex items-center gap-2 text-sm text-zinc-600">
-                <Spinner /> Uploading…
+      <StageSurface className="p-3">
+        <AnimatePresence mode="wait" initial={false}>
+          {doc ? (
+            <motion.div key="file" {...SWAP} className="flex items-center gap-4 p-3">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent text-primary">
+                <FileText className="h-5 w-5" aria-hidden="true" />
               </span>
-            </div>
-          ) : null}
-        </div>
-      )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-zinc-900">{doc.filename}</p>
+                <p className="text-xs text-zinc-600">{humanBytes(doc.size)} · uploaded</p>
+              </div>
+              <Button
+                onClick={() => {
+                  flow.goto("ANALYZING");
+                  navigate(`/analyze/${doc.id}`);
+                }}
+              >
+                Analyse manuscript <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div key="drop" {...SWAP} className="relative">
+              <Dropzone onAccept={handleAccept} maxMb={MAX_MB} disabled={busy} />
+              {busy ? (
+                <div className="absolute inset-0 grid place-items-center rounded-2xl bg-white/70 backdrop-blur-sm">
+                  <span className="inline-flex items-center gap-2 text-sm text-zinc-700">
+                    <Spinner /> Uploading…
+                  </span>
+                </div>
+              ) : null}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </StageSurface>
     </div>
   );
 }

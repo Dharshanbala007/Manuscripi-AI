@@ -151,7 +151,7 @@ All suites pass on the final `master`-bound state of this branch:
 |---|---|---|
 | Backend (pytest: unit + integration + API) | 137 tests | ✅ all passing |
 | Frontend (vitest: 7 test files) | 41 tests | ✅ all passing |
-| End-to-end (Playwright, Chromium, 8 spec files) | 24 tests | ✅ all passing |
+| End-to-end (Playwright, Chromium, 9 spec files) | 29 tests | ✅ all passing |
 | Linting / formatting | ruff, ruff-format, tsc | ✅ clean |
 
 `bash scripts/check.sh` runs all of the above in one command and is the
@@ -159,7 +159,7 @@ project's single source of truth for "is this green."
 
 ## 10. Playwright results
 
-Eight spec files under `frontend/e2e/`, run against the real application
+Nine spec files under `frontend/e2e/`, run against the real application
 (real backend, real browser, no mocking), covering every flow in the original
 QA checklist:
 
@@ -173,6 +173,7 @@ QA checklist:
 | `export.spec.ts` | Real DOCX download; PDF download (or the documented unavailable state, decided at runtime from `/api/health`). |
 | `resilience.spec.ts` | Reload mid-workflow, ended-session recovery, simulated backend outage, mobile-viewport layout. |
 | `a11y.spec.ts` | Automated axe scans on every major screen/tab, keyboard-only upload, dialog focus containment. |
+| `morph.spec.ts` | The morphing UI: flow rail advances with no console errors; the shared glass surface and the format dialog animate through intermediate frames (measured per animation frame); action buttons pass through pending/success; reduced motion disables the surface animation. |
 
 **One real bug was found and fixed via the mandated reproduce → understand →
 root cause → fix → restart → retest → regress loop**, plus three more caught

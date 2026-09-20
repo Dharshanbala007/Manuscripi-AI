@@ -42,6 +42,12 @@ export a verified DOCX or PDF.
   (with a real focus trap), visible focus rings, `aria-live` status/toast
   regions, and WCAG AA text contrast — verified by an automated axe scan plus
   a manual keyboard-navigation pass in the Playwright suite.
+- **Morphing interface** — one glass surface follows you through the flow: the
+  dropzone morphs into the file card, the analysis card, and the workspace header;
+  a progress rail's pill slides between Upload · Analyze · Review · Format · Export;
+  action buttons morph through pending → success → error; and the Apply-format
+  dialog expands out of its button. All motion honours `prefers-reduced-motion`,
+  and a Playwright test measures the morph frame by frame.
 
 The product never claims a document is "IEEE compliant" — it reports *"IEEE
 format profile applied"* and *"IEEE validation checks passed"* for the checks it
@@ -61,7 +67,7 @@ processing state machine.
 |---|---|
 | Backend | Python 3.12, FastAPI, python-docx, Pydantic v2, Uvicorn, pypdf, PyYAML |
 | PDF | headless LibreOffice (`soffice`) — local, optional |
-| Frontend | React 18, TypeScript, Vite 5, Tailwind 3, lucide-react |
+| Frontend | React 18, TypeScript, Vite 5, Tailwind 3, motion, class-variance-authority, lucide-react |
 | Tests | pytest (unit / integration / API), vitest (state machine, api client, components), Playwright + axe-core (end-to-end, accessibility) |
 
 ## Setup
@@ -155,6 +161,17 @@ See `docs/RULES.md` for every rule's provenance in both profiles.
 - Additional publisher profiles (and Springer template variants) as YAML.
 - Full session persistence so a document's workspace survives a backend restart.
 - Optional ML assist behind the existing confidence-returning interfaces.
+
+## Credits
+
+Two UI components were retrieved from [21st.dev](https://21st.dev) with the `21st` CLI and
+adapted (see `docs/superpowers/specs/2026-09-20-ui-21st-restyle-design.md` for what changed):
+
+- `@ibelick/morphing-dialog` → `frontend/src/components/ui/MorphingDialog.tsx`
+- `@ddoemonn/loading-button` → `frontend/src/components/ui/MorphButton.tsx`
+
+The rest of the restyle (glass surfaces, flow rail, animated tabs, dropzone) is written
+in-repo in the same visual language.
 
 ## License
 

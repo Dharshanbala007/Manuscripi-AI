@@ -4,8 +4,8 @@ import { useId } from "react";
 import { cn } from "../../lib/cn";
 
 const CONTROL =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 " +
-  "placeholder:text-zinc-400 focus:border-primary focus:outline-none disabled:bg-zinc-50";
+  "w-full rounded-lg border border-zinc-300 bg-white/80 px-3 py-2 text-sm text-zinc-900 transition-[border-color,box-shadow] " +
+  "placeholder:text-zinc-500 focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_hsl(var(--primary)/0.12)] focus:outline-none disabled:bg-zinc-50";
 
 function Wrapper({
   label,

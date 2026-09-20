@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { StageSurface } from "../components/layout/StageSurface";
 import { ComparePanel } from "../components/workspace/ComparePanel";
 import { ElementsList } from "../components/workspace/ElementsList";
 import { ExportBar } from "../components/workspace/ExportBar";
@@ -19,6 +20,7 @@ import { ErrorState, Spinner } from "../components/ui/Feedback";
 import { Tabs } from "../components/ui/Tabs";
 import { useToast } from "../components/ui/Toast";
 import { ApiError } from "../lib/api";
+import { stageForDocState, useFlowStage } from "../state/flowStage";
 import { useDocumentFlow } from "../state/useDocumentFlow";
 import { useWorkspace } from "../workspace/useWorkspace";
 
@@ -32,6 +34,12 @@ export function WorkspacePage() {
   const toast = useToast();
   const { goto } = useDocumentFlow();
   const ws = useWorkspace(id);
+  const { setWorkspaceStage } = useFlowStage();
+
+  useEffect(() => {
+    setWorkspaceStage(stageForDocState(ws.docState));
+    return () => setWorkspaceStage(null);
+  }, [ws.docState, setWorkspaceStage]);
 
   const [formatOpen, setFormatOpen] = useState(false);
   const [centerTab, setCenterTab] = useState<CenterTab>("review");
@@ -85,10 +93,14 @@ export function WorkspacePage() {
   }
 
   if (ws.loading) {
+    // Mount the shared surface in the same commit as the route change so it can morph
+    // out of the previous screen's surface; the header fills in once data arrives.
     return (
-      <div className="grid place-items-center py-24">
-        <Spinner className="h-6 w-6 text-primary" />
-      </div>
+      <StageSurface radius={20} className="px-5 py-3.5">
+        <div role="status" className="flex h-[34px] items-center gap-2.5 text-sm text-zinc-600">
+          <Spinner className="h-4 w-4 text-primary" /> Loading workspace…
+        </div>
+      </StageSurface>
     );
   }
 
@@ -106,15 +118,17 @@ export function WorkspacePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <TopBar
-        filename={ws.filename}
-        docState={ws.docState}
-        profileId={ws.profileId}
-        healthTotal={ws.health?.total ?? null}
-        formatOpen={formatOpen}
-        onOpenFormat={() => setFormatOpen(true)}
-        onValidate={validate}
-      />
+      <StageSurface radius={20} className="px-5 py-3.5">
+        <TopBar
+          filename={ws.filename}
+          docState={ws.docState}
+          profileId={ws.profileId}
+          healthTotal={ws.health?.total ?? null}
+          formatOpen={formatOpen}
+          onOpenFormat={() => setFormatOpen(true)}
+          onValidate={validate}
+        />
+      </StageSurface>
 
       <div className="flex gap-2 lg:hidden">
         <Button size="sm" variant="secondary" onClick={() => setDrawer("outline")}>

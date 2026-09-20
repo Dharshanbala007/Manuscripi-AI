@@ -1,6 +1,6 @@
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { FileCheck2, ListChecks, Wand2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, forwardRef } from "react";
 
 import { titleCase } from "../../lib/format";
 import { Badge } from "../ui/Badge";
@@ -11,10 +11,10 @@ import { FORMAT_DIALOG_ID } from "./FormatPicker";
 const POP = { type: "spring", stiffness: 420, damping: 30 } as const;
 
 // Pills pop in/out and their siblings glide to make room.
-function Pill({ id, children }: { id: string; children: ReactNode }) {
+const Pill = forwardRef<HTMLSpanElement, { children: ReactNode }>(function Pill({ children }, ref) {
   return (
     <motion.span
-      key={id}
+      ref={ref}
       layout
       initial={{ opacity: 0, scale: 0.85, y: 4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -25,7 +25,7 @@ function Pill({ id, children }: { id: string; children: ReactNode }) {
       {children}
     </motion.span>
   );
-}
+});
 
 export function TopBar({
   filename,
@@ -58,16 +58,16 @@ export function TopBar({
             {filename || "Manuscript"}
           </motion.h1>
           <AnimatePresence mode="popLayout" initial={false}>
-            <Pill id={`state-${docState}`} key={`state-${docState}`}>
+            <Pill key={`state-${docState}`}>
               <Badge tone="neutral">{titleCase(docState)}</Badge>
             </Pill>
             {profileId ? (
-              <Pill id={`profile-${profileId}`} key={`profile-${profileId}`}>
+              <Pill key={`profile-${profileId}`}>
                 <Badge tone="accent">{profileId.toUpperCase()} profile applied</Badge>
               </Pill>
             ) : null}
             {healthTotal !== null ? (
-              <Pill id={`health-${healthTotal}`} key={`health-${healthTotal}`}>
+              <Pill key={`health-${healthTotal}`}>
                 <Badge tone={healthTotal >= 85 ? "success" : healthTotal >= 65 ? "warning" : "danger"}>
                   Health {healthTotal}
                 </Badge>

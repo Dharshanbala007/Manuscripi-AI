@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { StageList, pendingStages } from "../components/analyze/StageList";
+import { StageSurface } from "../components/layout/StageSurface";
 import { Button } from "../components/ui/Button";
-import { Card, CardBody } from "../components/ui/Card";
 import { ErrorState } from "../components/ui/Feedback";
 import { usePolling } from "../hooks/usePolling";
 import { ApiError, api } from "../lib/api";
@@ -89,11 +89,9 @@ export function AnalyzePage() {
         </p>
       </div>
 
-      <Card>
-        <CardBody>
-          <StageList stages={stages} />
-        </CardBody>
-      </Card>
+      <StageSurface className="p-5">
+        <StageList stages={stages} />
+      </StageSurface>
 
       {data?.stats ? <StatsRow stats={data.stats} /> : null}
     </div>
@@ -111,7 +109,7 @@ function StatsRow({ stats }: { stats: StatsOut }) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
       {items.map(([label, value]) => (
-        <div key={label} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-center">
+        <div key={label} className="glass rounded-xl px-3 py-2 text-center">
           <div className="text-lg font-semibold tabular-nums text-zinc-900">{value}</div>
           <div className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</div>
         </div>
