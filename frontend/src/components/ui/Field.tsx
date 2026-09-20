@@ -5,7 +5,7 @@ import { cn } from "../../lib/cn";
 
 const CONTROL =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 " +
-  "placeholder:text-zinc-400 focus:border-accent focus:outline-none disabled:bg-zinc-50";
+  "placeholder:text-zinc-400 focus:border-primary focus:outline-none disabled:bg-zinc-50";
 
 function Wrapper({
   label,

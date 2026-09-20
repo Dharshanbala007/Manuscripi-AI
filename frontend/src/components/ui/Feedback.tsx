@@ -32,7 +32,7 @@ export function Progress({ value, label }: { value: number; label?: string }) {
       aria-valuemax={100}
       aria-label={label}
     >
-      <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${pct}%` }} />
+      <div className="h-full rounded-full bg-primary transition-[width] duration-500" style={{ width: `${pct}%` }} />
     </div>
   );
 }

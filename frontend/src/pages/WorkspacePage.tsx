@@ -89,7 +89,7 @@ export function WorkspacePage() {
   if (ws.loading) {
     return (
       <div className="grid place-items-center py-24">
-        <Spinner className="h-6 w-6 text-accent" />
+        <Spinner className="h-6 w-6 text-primary" />
       </div>
     );
   }

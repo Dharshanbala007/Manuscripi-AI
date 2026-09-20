@@ -8,7 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight text-zinc-900">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-accent text-white">
+            <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary text-white">
               <FileText className="h-4 w-4" />
             </span>
             ManuScript AI

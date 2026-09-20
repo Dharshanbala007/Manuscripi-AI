@@ -58,7 +58,7 @@ export function UploadPage() {
       {doc ? (
         <Card>
           <CardBody className="flex items-center gap-4">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent-soft text-accent">
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent text-primary">
               <FileText className="h-5 w-5" />
             </span>
             <div className="min-w-0 flex-1">

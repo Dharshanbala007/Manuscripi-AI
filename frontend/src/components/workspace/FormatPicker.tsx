@@ -71,7 +71,7 @@ export function FormatPicker({
               className={cn(
                 "rounded-xl border p-4 text-left transition-colors",
                 disabled && "cursor-not-allowed opacity-60",
-                isSelected ? "border-accent bg-accent-soft" : "border-zinc-200 hover:border-zinc-300",
+                isSelected ? "border-primary bg-accent" : "border-zinc-200 hover:border-zinc-300",
               )}
             >
               <div className="flex items-center justify-between">
@@ -79,7 +79,7 @@ export function FormatPicker({
                 {disabled ? (
                   <Badge tone="muted">Planned</Badge>
                 ) : isSelected ? (
-                  <Check className="h-4 w-4 text-accent" />
+                  <Check className="h-4 w-4 text-primary" />
                 ) : null}
               </div>
               <p className="mt-1 text-xs text-zinc-500">{p.summary}</p>

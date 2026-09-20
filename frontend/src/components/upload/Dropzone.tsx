@@ -72,11 +72,11 @@ export function Dropzone({
           "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors",
           disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
           dragging
-            ? "border-accent bg-accent-soft"
+            ? "border-primary bg-accent"
             : "border-zinc-300 bg-white hover:border-zinc-400",
         )}
       >
-        <span className="grid h-11 w-11 place-items-center rounded-full bg-accent-soft text-accent">
+        <span className="grid h-11 w-11 place-items-center rounded-full bg-accent text-primary">
           <UploadCloud className="h-5 w-5" aria-hidden="true" />
         </span>
         <div>

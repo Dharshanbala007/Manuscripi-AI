@@ -85,7 +85,7 @@ export function IssuesPanel({
                         <button
                           type="button"
                           onClick={() => onLocate(issue.location as string)}
-                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                         >
                           Review <ArrowRight className="h-3 w-3" />
                         </button>

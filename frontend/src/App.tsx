@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AppShell } from "./components/layout/AppShell";
@@ -9,6 +10,7 @@ import { WorkspacePage } from "./pages/WorkspacePage";
 
 export function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <ToastProvider>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AppShell>
@@ -22,5 +24,6 @@ export function App() {
         </AppShell>
       </BrowserRouter>
     </ToastProvider>
+    </MotionConfig>
   );
 }

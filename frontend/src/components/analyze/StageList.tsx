@@ -58,7 +58,7 @@ function StageIcon({ status }: { status: StageOut["status"] }) {
     );
   }
   if (status === "active") {
-    return <Spinner className="h-5 w-5 text-accent" />;
+    return <Spinner className="h-5 w-5 text-primary" />;
   }
   return <span className="h-5 w-5 rounded-full border-2 border-zinc-200" aria-hidden="true" />;
 }

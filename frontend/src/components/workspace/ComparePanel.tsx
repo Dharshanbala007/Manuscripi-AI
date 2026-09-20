@@ -46,7 +46,7 @@ export function ComparePanel({
         <CardHeader title="Before / after" />
         <CardBody>
           <div className="grid place-items-center py-10">
-            <Spinner className="h-5 w-5 text-accent" />
+            <Spinner className="h-5 w-5 text-primary" />
           </div>
         </CardBody>
       </Card>
