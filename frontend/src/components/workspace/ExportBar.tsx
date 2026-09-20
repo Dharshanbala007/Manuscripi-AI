@@ -1,9 +1,8 @@
 import { Download, FileText } from "lucide-react";
-import { useState } from "react";
 
 import { api } from "../../lib/api";
 import { useToast } from "../ui/Toast";
-import { Button } from "../ui/Button";
+import { MorphButton } from "../ui/MorphButton";
 
 async function downloadFile(url: string, filename: string): Promise<void> {
   const res = await fetch(url);
@@ -40,11 +39,9 @@ export function ExportBar({
   pdfExport: boolean;
 }) {
   const toast = useToast();
-  const [busy, setBusy] = useState<"docx" | "pdf" | null>(null);
   const base = `manuscript_${profileId ?? "ieee"}_formatted`;
 
   async function run(kind: "docx" | "pdf") {
-    setBusy(kind);
     try {
       await downloadFile(
         kind === "docx" ? api.exportDocxUrl(docId) : api.exportPdfUrl(docId),
@@ -53,25 +50,32 @@ export function ExportBar({
       toast.success(`${kind.toUpperCase()} exported.`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Export failed.");
-    } finally {
-      setBusy(null);
+      throw err;
     }
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button onClick={() => run("docx")} disabled={!ready} loading={busy === "docx"}>
-        <FileText className="h-4 w-4" /> Export DOCX
-      </Button>
-      <Button
-        variant="secondary"
-        onClick={() => run("pdf")}
-        disabled={!ready || !pdfExport}
-        loading={busy === "pdf"}
-        title={pdfExport ? undefined : "PDF export needs LibreOffice on the server"}
+      <MorphButton
+        variant="primary"
+        icon={<FileText className="h-3.5 w-3.5" aria-hidden="true" />}
+        disabled={!ready}
+        pendingLabel="Exporting…"
+        successLabel="Exported"
+        onAction={() => run("docx")}
       >
-        <Download className="h-4 w-4" /> Export PDF
-      </Button>
+        Export DOCX
+      </MorphButton>
+      <MorphButton
+        icon={<Download className="h-3.5 w-3.5" aria-hidden="true" />}
+        disabled={!ready || !pdfExport}
+        title={pdfExport ? undefined : "PDF export needs LibreOffice on the server"}
+        pendingLabel="Exporting…"
+        successLabel="Exported"
+        onAction={() => run("pdf")}
+      >
+        Export PDF
+      </MorphButton>
       {!pdfExport ? (
         <span className="text-xs text-zinc-500">PDF export unavailable on this machine.</span>
       ) : null}

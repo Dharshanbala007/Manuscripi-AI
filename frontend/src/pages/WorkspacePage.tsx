@@ -34,7 +34,6 @@ export function WorkspacePage() {
   const ws = useWorkspace(id);
 
   const [formatOpen, setFormatOpen] = useState(false);
-  const [validating, setValidating] = useState(false);
   const [centerTab, setCenterTab] = useState<CenterTab>("review");
   const [drawer, setDrawer] = useState<null | "outline" | "issues">(null);
 
@@ -69,11 +68,11 @@ export function WorkspacePage() {
       const message = err instanceof ApiError ? err.message : "Formatting failed.";
       goto("ERROR", { error: message });
       toast.error(message);
+      throw err;
     }
   }
 
   async function validate() {
-    setValidating(true);
     goto("VALIDATING");
     try {
       await ws.runValidate();
@@ -81,8 +80,7 @@ export function WorkspacePage() {
       toast.success("Validation checks completed.");
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Validation failed.");
-    } finally {
-      setValidating(false);
+      throw err;
     }
   }
 
@@ -113,9 +111,9 @@ export function WorkspacePage() {
         docState={ws.docState}
         profileId={ws.profileId}
         healthTotal={ws.health?.total ?? null}
+        formatOpen={formatOpen}
         onOpenFormat={() => setFormatOpen(true)}
         onValidate={validate}
-        validating={validating}
       />
 
       <div className="flex gap-2 lg:hidden">

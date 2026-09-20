@@ -5,6 +5,7 @@ import { percent } from "../../lib/format";
 import type { MetadataIn, MetadataOut } from "../../lib/types";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
+import { MorphButton } from "../ui/MorphButton";
 import { Card, CardBody, CardHeader } from "../ui/Card";
 import { TextArea, TextField } from "../ui/Field";
 
@@ -61,7 +62,6 @@ export function MetadataEditor({
   onSave: (body: MetadataIn) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(metadata));
-  const [saving, setSaving] = useState(false);
   const pristine = useMemo(() => toDraft(metadata), [metadata]);
 
   useEffect(() => {
@@ -71,12 +71,7 @@ export function MetadataEditor({
   const dirty = JSON.stringify(draft) !== JSON.stringify(pristine);
 
   async function save() {
-    setSaving(true);
-    try {
-      await onSave(toPayload(draft));
-    } finally {
-      setSaving(false);
-    }
+    await onSave(toPayload(draft));
   }
 
   return (
@@ -85,9 +80,16 @@ export function MetadataEditor({
         title="Metadata"
         description="Review and correct what was detected. Edits are kept as authoritative."
         action={
-          <Button size="sm" onClick={save} disabled={!dirty} loading={saving}>
+          <MorphButton
+            variant="primary"
+            size="sm"
+            disabled={!dirty}
+            pendingLabel="Saving…"
+            successLabel="Saved"
+            onAction={save}
+          >
             Save changes
-          </Button>
+          </MorphButton>
         }
       />
       <CardBody className="flex flex-col gap-4">

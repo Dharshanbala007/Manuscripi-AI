@@ -1,33 +1,45 @@
+import { type VariantProps, cva } from "class-variance-authority";
 import type { ButtonHTMLAttributes } from "react";
 
-import { cn } from "../../lib/cn";
+import { cn } from "@/lib/cn";
 import { Spinner } from "./Feedback";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
-type Size = "sm" | "md";
+// Skin derived from the 21st.dev @ddoemonn/loading-button: 1px hairline, inset top
+// highlight, soft drop shadow, 9px radius, 1px press.
+export const buttonVariants = cva(
+  "relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap font-medium outline-none " +
+    "transition-[background-color,border-color,box-shadow,color] duration-150 active:translate-y-px " +
+    "disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        primary:
+          "border border-primary bg-primary text-primary-foreground hover:bg-primary/90 " +
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(49,46,129,0.35),0_10px_22px_-12px_rgba(79,70,229,0.75)]",
+        secondary:
+          "border border-border bg-white text-zinc-800 hover:bg-zinc-50 " +
+          "shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)]",
+        ghost: "text-zinc-600 hover:bg-zinc-100/80",
+        danger: "border border-red-700 bg-red-700 text-white hover:bg-red-800",
+      },
+      size: {
+        sm: "h-8 rounded-[8px] px-3 text-xs",
+        md: "h-9 rounded-[9px] px-3.5 text-[13px]",
+      },
+    },
+    defaultVariants: { variant: "primary", size: "md" },
+  },
+);
 
-const VARIANT: Record<Variant, string> = {
-  primary: "bg-primary text-white hover:bg-primary/90 disabled:bg-primary/50",
-  secondary:
-    "bg-white text-zinc-800 border border-zinc-300 hover:bg-zinc-50 disabled:opacity-50",
-  ghost: "text-zinc-600 hover:bg-zinc-100 disabled:opacity-40",
-  danger: "bg-red-600 text-white hover:bg-red-700 disabled:opacity-50",
-};
-
-const SIZE: Record<Size, string> = {
-  sm: "h-8 px-3 text-xs",
-  md: "h-9 px-4 text-sm",
-};
-
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
+export interface ButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   loading?: boolean;
 }
 
 export function Button({
-  variant = "primary",
-  size = "md",
+  variant,
+  size,
   loading = false,
   className,
   children,
@@ -36,12 +48,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={cn(
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-colors active:scale-[0.98]",
-        VARIANT[variant],
-        SIZE[size],
-        className,
-      )}
+      className={cn(buttonVariants({ variant, size }), className)}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...rest}
