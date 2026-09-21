@@ -152,24 +152,24 @@ export function MorphButton({
           : children;
 
   const faces = [
-    { key: "idle", text: children, icon, tone: solid ? "text-white" : "text-zinc-800" },
+    { key: "idle", text: children, icon, tone: solid ? "text-white" : "text-foreground" },
     {
       key: "pending",
       text: pendingLabel,
       icon: <Spinner still={reduced === true || status !== "pending"} />,
-      tone: solid ? "text-white/90" : "text-zinc-600",
+      tone: solid ? "text-white/90" : "text-muted-foreground",
     },
     {
       key: "success",
       text: successLabel,
       icon: <Glyph d="M2.6 6.3 4.9 8.6 9.4 3.6" />,
-      tone: solid ? "text-white" : "text-emerald-700",
+      tone: solid ? "text-white" : "text-emerald-700 dark:text-emerald-400",
     },
     {
       key: "error",
       text: errorLabel,
       icon: <Glyph d="M6 2.9v3.5M6 9.05h.01" w={1.9} />,
-      tone: solid ? "text-white" : "text-red-700",
+      tone: solid ? "text-white" : "text-red-700 dark:text-red-400",
     },
   ];
 

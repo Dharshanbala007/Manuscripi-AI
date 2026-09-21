@@ -26,7 +26,7 @@ export function Tabs({
   const indicatorId = useId();
 
   return (
-    <div role="tablist" className="flex items-center gap-1 overflow-x-auto rounded-xl bg-zinc-100/80 p-1 ring-1 ring-inset ring-zinc-200/60">
+    <div role="tablist" className="flex items-center gap-1 overflow-x-auto rounded-xl bg-zinc-100/80 p-1 ring-1 ring-inset ring-zinc-200/60 dark:bg-white/5 dark:ring-white/10">
       {items.map((item) => {
         const selected = item.id === active;
         return (
@@ -38,14 +38,14 @@ export function Tabs({
             className={cn(
               "relative shrink-0 whitespace-nowrap rounded-lg font-medium transition-colors",
               size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-sm",
-              selected ? "text-zinc-900" : "text-zinc-600 hover:text-zinc-900",
+              selected ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
             )}
           >
             {selected ? (
               <motion.span
                 layoutId={indicatorId}
                 aria-hidden="true"
-                className="absolute inset-0 bg-white shadow-[0_1px_2px_rgba(24,24,27,0.08),0_2px_6px_-2px_rgba(67,56,202,0.25)]"
+                className="absolute inset-0 bg-white shadow-[0_1px_2px_rgba(24,24,27,0.08),0_2px_6px_-2px_rgba(67,56,202,0.25)] dark:bg-zinc-800"
                 style={{ borderRadius: 8 }}
                 transition={SLIDE}
               />
@@ -53,7 +53,7 @@ export function Tabs({
             <span className="relative">
               {item.label}
               {item.count !== undefined ? (
-                <span className="ml-1.5 tabular-nums text-zinc-600">{item.count}</span>
+                <span className="ml-1.5 tabular-nums text-zinc-600 dark:text-zinc-400">{item.count}</span>
               ) : null}
             </span>
           </button>

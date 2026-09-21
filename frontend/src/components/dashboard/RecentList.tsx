@@ -36,7 +36,7 @@ export function RecentList({ limit = 8 }: { limit?: number }) {
   }
 
   if (entries === null) {
-    return <p className="text-xs text-zinc-500">Loading…</p>;
+    return <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading…</p>;
   }
   if (entries.length === 0) {
     return (
@@ -54,18 +54,18 @@ export function RecentList({ limit = 8 }: { limit?: number }) {
   }
 
   return (
-    <ul className="divide-y divide-zinc-100">
+    <ul className="divide-y divide-zinc-100 dark:divide-white/10">
       {entries.map((entry) => (
         <li key={entry.id} className="flex items-center gap-3 py-2.5">
           <button
             type="button"
             onClick={() => navigate(`/workspace/${entry.id}`)}
-            className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-1 text-left hover:bg-zinc-50"
+            className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-1 text-left hover:bg-zinc-50 hover:dark:bg-white/5"
           >
-            <FileText className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
+            <FileText className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm text-zinc-800">{entry.filename}</span>
-              <span className="text-[11px] text-zinc-500">{shortDate(entry.updated_at)}</span>
+              <span className="block truncate text-sm text-zinc-800 dark:text-zinc-100">{entry.filename}</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">{shortDate(entry.updated_at)}</span>
             </span>
             {entry.profile_id ? <Badge tone="neutral">{entry.profile_id.toUpperCase()}</Badge> : null}
             <Badge tone="muted">{titleCase(entry.state)}</Badge>
@@ -77,7 +77,7 @@ export function RecentList({ limit = 8 }: { limit?: number }) {
             type="button"
             onClick={() => remove(entry.id)}
             aria-label={`Remove ${entry.filename} from history`}
-            className="rounded p-1 text-zinc-400 hover:text-zinc-700"
+            className="rounded p-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 hover:dark:text-zinc-200"
           >
             <X className="h-3.5 w-3.5" />
           </button>

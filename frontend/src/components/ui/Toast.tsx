@@ -33,9 +33,9 @@ const ICON: Record<ToastTone, typeof Info> = {
   info: Info,
 };
 const TONE_CLASS: Record<ToastTone, string> = {
-  success: "border-emerald-200 text-emerald-800",
-  error: "border-red-200 text-red-800",
-  info: "border-zinc-200 text-zinc-800",
+  success: "border-emerald-200 text-emerald-800 dark:border-emerald-500/25 dark:text-emerald-300",
+  error: "border-red-200 text-red-800 dark:border-red-500/25 dark:text-red-300",
+  info: "border-zinc-200 text-zinc-800 dark:border-white/10 dark:text-zinc-200",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 exit={{ opacity: 0, x: 24, scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 420, damping: 32 }}
                 className={cn(
-                  "pointer-events-auto flex items-start gap-2 rounded-xl border bg-white/90 px-3 py-2 text-sm shadow-raised backdrop-blur-xl",
+                  "pointer-events-auto flex items-start gap-2 rounded-xl border bg-white/90 px-3 py-2 text-sm shadow-raised backdrop-blur-xl dark:bg-zinc-900/85",
                   TONE_CLASS[toast.tone],
                 )}
               >
@@ -94,7 +94,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => remove(toast.id)}
-                  className="text-zinc-500 hover:text-zinc-700"
+                  className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
                   aria-label="Dismiss notification"
                 >
                   ×

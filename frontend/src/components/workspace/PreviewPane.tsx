@@ -28,7 +28,7 @@ export function PreviewPane({ docId, ready }: { docId: string; ready: boolean })
             key={nonce}
             title="Document preview"
             src={`${api.previewUrl(docId)}?v=${nonce}`}
-            className="h-[70vh] w-full rounded-lg border border-zinc-200 bg-white"
+            className="h-[70vh] w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-white"
           />
         ) : (
           <EmptyState title="Apply a format to preview the document" />

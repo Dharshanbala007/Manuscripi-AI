@@ -83,8 +83,8 @@ export function AnalyzePage() {
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900">Analysing manuscript</h1>
-        <p className="mt-1 text-sm text-zinc-600">
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Analysing manuscript</h1>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           Reading the document and detecting its structure. This runs locally on your machine.
         </p>
       </div>
@@ -110,8 +110,8 @@ function StatsRow({ stats }: { stats: StatsOut }) {
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
       {items.map(([label, value]) => (
         <div key={label} className="glass rounded-xl px-3 py-2 text-center">
-          <div className="text-lg font-semibold tabular-nums text-zinc-900">{value}</div>
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</div>
+          <div className="text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">{value}</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</div>
         </div>
       ))}
     </div>

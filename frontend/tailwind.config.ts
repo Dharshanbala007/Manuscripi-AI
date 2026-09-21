@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
 export default {
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
@@ -32,6 +33,8 @@ export default {
         raised: "0 8px 24px rgba(24,24,27,0.10)",
         glass:
           "0 1px 0 rgba(255,255,255,0.9) inset, 0 0 0 1px rgba(24,24,27,0.05), 0 8px 30px -12px rgba(67,56,202,0.18)",
+        "glass-dark":
+          "0 1px 0 rgba(255,255,255,0.07) inset, 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px -20px rgba(129,105,255,0.45)",
         glow: "0 10px 30px -10px rgba(79,70,229,0.55)",
       },
       keyframes: {

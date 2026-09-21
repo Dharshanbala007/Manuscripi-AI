@@ -51,14 +51,14 @@ export function UploadPage() {
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <Link to="/" className="inline-flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-900">
+      <Link to="/" className="inline-flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 hover:dark:text-zinc-50">
         <ArrowLeft className="h-3.5 w-3.5" /> Back to dashboard
       </Link>
 
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-900">Upload a manuscript</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Word <code className="rounded bg-zinc-100 px-1">.docx</code> only, up to {MAX_MB} MB. The
+        <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Upload a manuscript</h1>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          Word <code className="rounded bg-zinc-100 dark:bg-white/5 px-1">.docx</code> only, up to {MAX_MB} MB. The
           original file is never modified.
         </p>
       </div>
@@ -71,8 +71,8 @@ export function UploadPage() {
                 <FileText className="h-5 w-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-zinc-900">{doc.filename}</p>
-                <p className="text-xs text-zinc-600">{humanBytes(doc.size)} · uploaded</p>
+                <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">{doc.filename}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">{humanBytes(doc.size)} · uploaded</p>
               </div>
               <Button
                 onClick={() => {
@@ -87,8 +87,8 @@ export function UploadPage() {
             <motion.div key="drop" {...SWAP} className="relative">
               <Dropzone onAccept={handleAccept} maxMb={MAX_MB} disabled={busy} />
               {busy ? (
-                <div className="absolute inset-0 grid place-items-center rounded-2xl bg-white/70 backdrop-blur-sm">
-                  <span className="inline-flex items-center gap-2 text-sm text-zinc-700">
+                <div className="absolute inset-0 grid place-items-center rounded-2xl bg-white/70 backdrop-blur-sm dark:bg-black/50">
+                  <span className="inline-flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
                     <Spinner /> Uploading…
                   </span>
                 </div>

@@ -92,7 +92,7 @@ export function MorphingDialogContainer({ children }: { children: ReactNode }) {
         <>
           <motion.div
             key="backdrop"
-            className="fixed inset-0 z-50 bg-zinc-900/25 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-zinc-900/25 backdrop-blur-sm dark:bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -173,7 +173,7 @@ export function MorphingDialogContent({
       style={{ borderRadius: radius }}
       className={cn(
         "pointer-events-auto relative w-full overflow-hidden outline-none",
-        "border border-white/80 bg-white/90 shadow-[0_30px_80px_-20px_rgba(49,46,129,0.35)] backdrop-blur-2xl",
+        "glass shadow-[0_30px_80px_-20px_rgba(49,46,129,0.35)] backdrop-blur-2xl dark:backdrop-blur-md",
         className,
       )}
     >
@@ -208,7 +208,7 @@ export function MorphingDialogClose({ className }: { className?: string }) {
       aria-label="Close dialog"
       onClick={() => setIsOpen(false)}
       className={cn(
-        "grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800",
+        "grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-zinc-100",
         className,
       )}
     >

@@ -74,12 +74,12 @@ export function Dropzone({
           disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
           dragging
             ? "scale-[1.015] border-primary bg-accent shadow-[0_0_0_6px_hsl(var(--primary)/0.10)]"
-            : "border-primary/30 bg-white/50 hover:border-primary/60 hover:bg-white/80",
+            : "border-primary/30 bg-white/50 hover:border-primary/60 hover:bg-white/80 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]",
         )}
       >
         <motion.span
           aria-hidden="true"
-          className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent to-white text-primary shadow-glass"
+          className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent to-white text-primary shadow-glass dark:to-transparent"
           animate={{ y: dragging ? -6 : [0, -4, 0] }}
           transition={
             dragging
@@ -90,10 +90,10 @@ export function Dropzone({
           <UploadCloud className="h-5 w-5" />
         </motion.span>
         <div>
-          <p className="text-sm font-medium text-zinc-800">Drop your manuscript here</p>
-          <p className="mt-0.5 text-xs text-zinc-500">Upload a .DOCX file to begin</p>
+          <p className="text-sm font-medium text-foreground">Drop your manuscript here</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Upload a .DOCX file to begin</p>
         </div>
-        <span className="rounded-[9px] border border-border bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 shadow-sm transition-colors group-hover:bg-zinc-50">
+        <span className="rounded-[9px] border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors group-hover:bg-secondary">
           Browse files
         </span>
         <input

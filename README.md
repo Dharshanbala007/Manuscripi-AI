@@ -48,6 +48,11 @@ export a verified DOCX or PDF.
   action buttons morph through pending → success → error; and the Apply-format
   dialog expands out of its button. All motion honours `prefers-reduced-motion`,
   and a Playwright test measures the morph frame by frame.
+- **Dark-first liquid glass** — a full-black theme (default) with an animated silk
+  background behind frosted-glass panels, and a light theme behind a header toggle
+  (persisted, applied before first paint so there is no flash). The silk renders on a
+  small canvas, slows itself down if the page's frame rate sags, and draws a single
+  still frame under `prefers-reduced-motion`. Both themes pass the axe scan.
 
 The product never claims a document is "IEEE compliant" — it reports *"IEEE
 format profile applied"* and *"IEEE validation checks passed"* for the checks it
@@ -164,11 +169,14 @@ See `docs/RULES.md` for every rule's provenance in both profiles.
 
 ## Credits
 
-Two UI components were retrieved from [21st.dev](https://21st.dev) with the `21st` CLI and
+Some UI components were retrieved from [21st.dev](https://21st.dev) with the `21st` CLI and
 adapted (see `docs/superpowers/specs/2026-09-20-ui-21st-restyle-design.md` for what changed):
 
 - `@ibelick/morphing-dialog` → `frontend/src/components/ui/MorphingDialog.tsx`
 - `@ddoemonn/loading-button` → `frontend/src/components/ui/MorphButton.tsx`
+- a flow-arrow button → `frontend/src/components/ui/FlowButton.tsx` (theme-token colors)
+- a silk canvas background → `frontend/src/components/layout/SilkBackground.tsx`
+  (quarter-resolution, adaptive frame rate, still frame under reduced motion)
 
 The rest of the restyle (glass surfaces, flow rail, animated tabs, dropzone) is written
 in-repo in the same visual language.

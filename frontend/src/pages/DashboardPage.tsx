@@ -1,12 +1,12 @@
 import { motion } from "motion/react";
-import { ArrowRight, FileText, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { FileText, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { RecentList } from "../components/dashboard/RecentList";
 import { Badge } from "../components/ui/Badge";
-import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
+import { FlowButton } from "../components/ui/FlowButton";
 import { api } from "../lib/api";
 import type { ProfileSummary } from "../lib/types";
 
@@ -30,7 +30,7 @@ export function DashboardPage() {
         <Badge tone="accent">
           <Sparkles className="h-3 w-3" /> Rule-based · offline-capable
         </Badge>
-        <h1 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-900">
+        <h1 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tight text-foreground">
           Turn a raw manuscript into a{" "}
           <span className="relative whitespace-nowrap">
             publication-ready
@@ -41,14 +41,13 @@ export function DashboardPage() {
           </span>{" "}
           document.
         </h1>
-        <p className="max-w-2xl text-sm text-zinc-600">
-          Upload an unformatted Word <code className="rounded bg-zinc-100 px-1">.docx</code>. ManuScript
-          AI analyses its structure, applies a publisher format profile, validates the result, and
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          Upload an unformatted Word{" "}
+          <code className="rounded bg-secondary px-1 text-foreground">.docx</code>. ManuScript AI
+          analyses its structure, applies a publisher format profile, validates the result, and
           exports a verified DOCX or PDF — all on this machine.
         </p>
-        <Button onClick={() => navigate("/upload")} className="mt-1 h-10 px-5 text-sm shadow-glow">
-          New manuscript <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Button>
+        <FlowButton text="New manuscript" onClick={() => navigate("/upload")} className="mt-1" />
       </motion.section>
 
       <motion.div variants={RISE} className="grid gap-5 md:grid-cols-2">
@@ -56,18 +55,18 @@ export function DashboardPage() {
           <CardHeader title="Supported publication formats" />
           <CardBody className="flex flex-col gap-3">
             {formats.length === 0 ? (
-              <p className="text-xs text-zinc-500">Loading…</p>
+              <p className="text-xs text-muted-foreground">Loading…</p>
             ) : (
               formats.map((f) => (
                 <div key={f.id} className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-zinc-900">{f.name}</span>
+                      <span className="text-sm font-medium text-foreground">{f.name}</span>
                       <Badge tone={f.status === "available" ? "success" : "muted"}>
                         {f.status === "available" ? "Available" : "Planned"}
                       </Badge>
                     </div>
-                    <p className="mt-0.5 text-xs text-zinc-500">{f.summary}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{f.summary}</p>
                   </div>
                 </div>
               ))
@@ -77,7 +76,7 @@ export function DashboardPage() {
 
         <Card>
           <CardHeader title="How it works" />
-          <CardBody className="flex flex-col gap-3 text-sm text-zinc-600">
+          <CardBody className="flex flex-col gap-3 text-sm text-muted-foreground">
             <Step icon={FileText} text="Analyse — parse the document and classify every element with a confidence score." />
             <Step icon={ShieldCheck} text="Format & validate — apply the profile, then check structure, references, and layout." />
             <Step icon={Lock} text="Private — processing runs locally; nothing is uploaded to any external service." />
@@ -103,7 +102,7 @@ export function DashboardPage() {
 function Step({ icon: Icon, text }: { icon: typeof FileText; text: string }) {
   return (
     <div className="flex items-start gap-2.5">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       <span>{text}</span>
     </div>
   );

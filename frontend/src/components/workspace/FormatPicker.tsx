@@ -61,10 +61,10 @@ export function FormatPicker({
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <MorphingDialogTitle className="text-base font-semibold tracking-tight text-zinc-900">
+                <MorphingDialogTitle className="text-base font-semibold tracking-tight text-foreground">
                   Choose a publication format
                 </MorphingDialogTitle>
-                <MorphingDialogDescription className="mt-1 text-sm text-zinc-600">
+                <MorphingDialogDescription className="mt-1 text-sm text-muted-foreground">
                   You can change this and re-apply before exporting.
                 </MorphingDialogDescription>
               </div>
@@ -86,21 +86,21 @@ export function FormatPicker({
                       disabled && "cursor-not-allowed opacity-60",
                       isSelected
                         ? "border-primary bg-accent shadow-[0_8px_24px_-14px_rgba(79,70,229,0.6)]"
-                        : "border-border bg-white/70 hover:border-zinc-300 hover:bg-white",
+                        : "border-border bg-white/70 hover:border-zinc-300 hover:bg-white dark:bg-white/[0.03] dark:hover:border-white/20 dark:hover:bg-white/[0.06]",
                     )}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-zinc-900">{p.name}</span>
+                      <span className="text-sm font-semibold text-foreground">{p.name}</span>
                       {disabled ? (
                         <Badge tone="muted">Planned</Badge>
                       ) : isSelected ? (
                         <Check className="h-4 w-4 text-primary" />
                       ) : null}
                     </div>
-                    <p className="mt-1 text-xs text-zinc-600">{p.summary}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{p.summary}</p>
                     <ul className="mt-2 flex flex-wrap gap-1.5">
                       {p.features.map((f) => (
-                        <li key={f} className="rounded bg-white/80 px-1.5 py-0.5 text-[11px] text-zinc-600">
+                        <li key={f} className="rounded bg-white/80 px-1.5 py-0.5 text-[11px] text-zinc-600 dark:bg-white/10 dark:text-zinc-300">
                           {f}
                         </li>
                       ))}

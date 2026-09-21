@@ -95,7 +95,7 @@ export function MetadataEditor({
       <CardBody className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-700">Title</span>
+            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Title</span>
             <ConfidenceTag value={metadata.title.confidence} edited={metadata.title.edited_by_user} />
           </div>
           <TextField
@@ -107,7 +107,7 @@ export function MetadataEditor({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-700">Authors</span>
+            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Authors</span>
             <ConfidenceTag
               value={metadata.authors.confidence}
               edited={metadata.authors.edited_by_user}
@@ -161,7 +161,7 @@ export function MetadataEditor({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-700">Abstract</span>
+            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Abstract</span>
             <ConfidenceTag
               value={metadata.abstract.confidence}
               edited={metadata.abstract.edited_by_user}
@@ -177,7 +177,7 @@ export function MetadataEditor({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-700">Keywords (comma-separated)</span>
+            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-200">Keywords (comma-separated)</span>
             <ConfidenceTag
               value={metadata.keywords.confidence}
               edited={metadata.keywords.edited_by_user}

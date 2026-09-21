@@ -17,9 +17,10 @@ export const buttonVariants = cva(
           "border border-primary bg-primary text-primary-foreground hover:bg-primary/90 " +
           "shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_2px_rgba(49,46,129,0.35),0_10px_22px_-12px_rgba(79,70,229,0.75)]",
         secondary:
-          "border border-border bg-white text-zinc-800 hover:bg-zinc-50 " +
-          "shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)]",
-        ghost: "text-zinc-600 hover:bg-zinc-100/80",
+          "border border-border bg-card text-foreground hover:bg-secondary " +
+          "shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)] " +
+          "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.4),0_1px_2px_rgba(0,0,0,0.4)]",
+        ghost: "text-muted-foreground hover:bg-secondary hover:text-foreground",
         danger: "border border-red-700 bg-red-700 text-white hover:bg-red-800",
       },
       size: {

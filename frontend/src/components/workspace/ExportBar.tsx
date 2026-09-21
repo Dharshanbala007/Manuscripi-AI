@@ -80,7 +80,7 @@ export function ExportBar({
         Export PDF
       </MorphButton>
       {!pdfExport ? (
-        <span className="text-xs text-zinc-500">PDF export unavailable on this machine.</span>
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">PDF export unavailable on this machine.</span>
       ) : null}
     </div>
   );

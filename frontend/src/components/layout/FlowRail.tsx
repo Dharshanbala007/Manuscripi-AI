@@ -45,8 +45,8 @@ export function FlowRail() {
                 className={cn(
                   "relative z-10 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-colors sm:px-3",
                   state === "active" && "text-white",
-                  state === "done" && "text-emerald-700",
-                  state === "todo" && "text-zinc-600",
+                  state === "done" && "text-emerald-700 dark:text-emerald-400",
+                  state === "todo" && "text-zinc-600 dark:text-zinc-400",
                 )}
               >
                 <span
@@ -54,8 +54,8 @@ export function FlowRail() {
                   className={cn(
                     "grid h-4 w-4 place-items-center rounded-full text-[10px] tabular-nums",
                     state === "active" && "bg-white/25",
-                    state === "done" && "bg-emerald-100",
-                    state === "todo" && "bg-zinc-200/70",
+                    state === "done" && "bg-emerald-100 dark:bg-emerald-500/20",
+                    state === "todo" && "bg-zinc-200/70 dark:bg-white/10",
                   )}
                 >
                   {state === "done" ? <Check className="h-2.5 w-2.5" /> : i + 1}

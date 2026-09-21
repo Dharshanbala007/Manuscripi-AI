@@ -11,7 +11,7 @@ export function OutlinePanel({
 }) {
   return (
     <nav aria-label="Document outline" className="text-sm">
-      <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+      <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         Outline
       </p>
       {nodes.length === 0 ? (
@@ -40,8 +40,8 @@ function OutlineItem({
         type="button"
         onClick={() => node.block_id && onLocate(node.block_id)}
         className={cn(
-          "w-full truncate rounded-md px-2 py-1 text-left hover:bg-zinc-100",
-          node.level === 1 ? "font-medium text-zinc-800" : "text-zinc-600",
+          "w-full truncate rounded-md px-2 py-1 text-left hover:bg-zinc-100 hover:dark:bg-white/5",
+          node.level === 1 ? "font-medium text-zinc-800 dark:text-zinc-100" : "text-zinc-600 dark:text-zinc-400",
         )}
         style={{ paddingLeft: `${(node.level - 1) * 12 + 8}px` }}
         title={node.label}

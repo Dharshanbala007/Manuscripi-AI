@@ -23,6 +23,33 @@
     --input: 240 6% 84%;
     --ring: 243 75% 59%;
     --radius: 0.75rem;
+    --aurora:
+      radial-gradient(52rem 36rem at 6% -8%, hsl(243 95% 80% / 0.6), transparent 64%),
+      radial-gradient(46rem 34rem at 98% 4%, hsl(199 95% 76% / 0.5), transparent 60%),
+      radial-gradient(44rem 30rem at 55% 108%, hsl(283 90% 82% / 0.45), transparent 64%);
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --background: 240 22% 5%;
+    --foreground: 240 10% 96%;
+    --card: 240 18% 9%;
+    --card-foreground: 240 10% 96%;
+    --primary: 243 88% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 14% 14%;
+    --secondary-foreground: 240 8% 92%;
+    --muted: 240 14% 14%;
+    --muted-foreground: 240 8% 66%;
+    --accent: 243 45% 18%;
+    --accent-foreground: 234 100% 87%;
+    --destructive: 0 78% 62%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 14% 20%;
+    --input: 240 14% 24%;
+    --ring: 243 88% 64%;
+    /* the animated silk canvas (SilkBackground) is the dark-theme backdrop */
+    --aurora: none;
   }
 
   * {
@@ -36,32 +63,33 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors duration-300;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   /* Aurora mesh lives on a fixed pseudo-element so the body keeps a solid colour
-     (axe computes contrast against it) while the page still gets depth. */
+     (axe computes contrast against it) while the page still gets depth. Each theme
+     defines its own --aurora gradient stack above. */
   body::before {
     content: "";
     position: fixed;
     inset: -10%;
     z-index: -1;
     pointer-events: none;
-    background:
-      radial-gradient(52rem 36rem at 6% -8%, hsl(243 95% 80% / 0.6), transparent 64%),
-      radial-gradient(46rem 34rem at 98% 4%, hsl(199 95% 76% / 0.5), transparent 60%),
-      radial-gradient(44rem 30rem at 55% 108%, hsl(283 90% 82% / 0.45), transparent 64%);
+    background: var(--aurora);
     animation: aurora 22s ease-in-out infinite;
+    transition: background 300ms ease;
   }
 }
 
 @layer utilities {
   .focus-ring {
-    @apply outline-none ring-2 ring-primary/40 ring-offset-2 ring-offset-white;
+    @apply outline-none ring-2 ring-primary/40 ring-offset-2 ring-offset-background;
   }
   .glass {
     @apply border border-white/70 bg-white/70 shadow-glass backdrop-blur-xl;
+    /* smaller blur in dark: every re-blur repaints when the silk moves, and the silk is soft anyway */
+    @apply dark:border-white/10 dark:bg-white/[0.06] dark:shadow-glass-dark dark:backdrop-blur-md;
   }
 }
 

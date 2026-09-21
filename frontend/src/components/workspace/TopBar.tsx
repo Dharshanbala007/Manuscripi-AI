@@ -52,7 +52,7 @@ export function TopBar({
         <div className="flex min-w-0 flex-wrap items-center gap-2.5">
           <motion.h1
             layout="position"
-            className="truncate text-base font-semibold tracking-tight text-zinc-900"
+            className="truncate text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
             title={filename}
           >
             {filename || "Manuscript"}
@@ -99,7 +99,7 @@ export function TopBar({
         >
           Validate
         </MorphButton>
-        <span className="hidden items-center gap-1 text-xs text-zinc-500 sm:flex">
+        <span className="hidden items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 sm:flex">
           <FileCheck2 className="h-3.5 w-3.5" aria-hidden="true" /> local
         </span>
       </div>

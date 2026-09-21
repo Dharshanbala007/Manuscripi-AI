@@ -29,15 +29,15 @@ export function StageList({ stages }: { stages: StageOut[] }) {
             <span
               className={cn(
                 "text-sm",
-                stage.status === "done" && "text-zinc-700",
-                stage.status === "active" && "font-medium text-zinc-900",
-                stage.status === "pending" && "text-zinc-500",
+                stage.status === "done" && "text-zinc-700 dark:text-zinc-200",
+                stage.status === "active" && "font-medium text-zinc-900 dark:text-zinc-50",
+                stage.status === "pending" && "text-zinc-500 dark:text-zinc-400",
               )}
             >
               {stage.label}
             </span>
             {stage.detail ? (
-              <span className="ml-auto text-xs tabular-nums text-zinc-500">{stage.detail}</span>
+              <span className="ml-auto text-xs tabular-nums text-zinc-500 dark:text-zinc-400">{stage.detail}</span>
             ) : null}
           </li>
         ))}
@@ -52,7 +52,7 @@ export function StageList({ stages }: { stages: StageOut[] }) {
 function StageIcon({ status }: { status: StageOut["status"] }) {
   if (status === "done") {
     return (
-      <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+      <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
         <Check className="h-3 w-3" aria-hidden="true" />
       </span>
     );
@@ -60,5 +60,5 @@ function StageIcon({ status }: { status: StageOut["status"] }) {
   if (status === "active") {
     return <Spinner className="h-5 w-5 text-primary" />;
   }
-  return <span className="h-5 w-5 rounded-full border-2 border-zinc-200" aria-hidden="true" />;
+  return <span className="h-5 w-5 rounded-full border-2 border-zinc-200 dark:border-white/10" aria-hidden="true" />;
 }

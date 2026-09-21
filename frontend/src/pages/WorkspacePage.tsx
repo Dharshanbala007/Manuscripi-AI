@@ -97,7 +97,7 @@ export function WorkspacePage() {
     // out of the previous screen's surface; the header fills in once data arrives.
     return (
       <StageSurface radius={20} className="px-5 py-3.5">
-        <div role="status" className="flex h-[34px] items-center gap-2.5 text-sm text-zinc-600">
+        <div role="status" className="flex h-[34px] items-center gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
           <Spinner className="h-4 w-4 text-primary" /> Loading workspace…
         </div>
       </StageSurface>
@@ -206,7 +206,7 @@ export function WorkspacePage() {
           className="fixed inset-0 z-50 bg-zinc-900/40 lg:hidden"
           onMouseDown={(e) => e.target === e.currentTarget && setDrawer(null)}
         >
-          <div className="absolute right-0 top-0 h-full w-[20rem] max-w-[85vw] overflow-y-auto bg-white p-4 shadow-raised">
+          <div className="absolute right-0 top-0 h-full w-[20rem] max-w-[85vw] overflow-y-auto bg-card p-4 shadow-raised">
             {drawer === "outline" ? (
               <OutlinePanel nodes={ws.outline} onLocate={locate} />
             ) : (

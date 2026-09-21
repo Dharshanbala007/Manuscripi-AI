@@ -23,8 +23,8 @@ export function StatsPanel({
         <dl className="grid grid-cols-3 gap-3 sm:grid-cols-6">
           {items.map(([label, value]) => (
             <div key={label} className="text-center">
-              <dd className="text-lg font-semibold tabular-nums text-zinc-900">{value}</dd>
-              <dt className="text-[11px] uppercase tracking-wide text-zinc-500">{label}</dt>
+              <dd className="text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">{value}</dd>
+              <dt className="text-[11px] uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</dt>
             </div>
           ))}
         </dl>

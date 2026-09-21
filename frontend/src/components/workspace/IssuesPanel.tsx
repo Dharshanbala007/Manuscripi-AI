@@ -16,7 +16,7 @@ const SEV_ICON = {
 const SEV_CLASS: Record<Severity, string> = {
   error: "text-red-500",
   warning: "text-amber-500",
-  info: "text-zinc-400",
+  info: "text-zinc-400 dark:text-zinc-500",
 };
 
 export function IssuesPanel({
@@ -72,20 +72,20 @@ export function IssuesPanel({
               return (
                 <li
                   key={issue.id}
-                  className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
+                  className="rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.04] px-3 py-2 text-sm"
                 >
                   <div className="flex items-start gap-2">
                     <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${SEV_CLASS[issue.severity]}`} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-zinc-800">{issue.message}</p>
+                      <p className="text-zinc-800 dark:text-zinc-100">{issue.message}</p>
                       {issue.suggested_action ? (
-                        <p className="mt-0.5 text-xs text-zinc-500">{issue.suggested_action}</p>
+                        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{issue.suggested_action}</p>
                       ) : null}
                       {issue.location ? (
                         <button
                           type="button"
                           onClick={() => onLocate(issue.location as string)}
-                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-accent-foreground hover:underline"
                         >
                           Review <ArrowRight className="h-3 w-3" />
                         </button>
