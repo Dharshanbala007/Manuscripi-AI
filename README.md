@@ -7,7 +7,9 @@ export a verified DOCX or PDF.
 
 > **Privacy:** manuscript content is processed entirely on your machine. Nothing
 > is uploaded to OpenAI, Claude, Gemini, or any external document service. The
-> processing pipeline needs no internet connection.
+> processing pipeline needs no internet connection. (The optional
+> [hosted demo](docs/DEPLOYMENT.md) is different: files are uploaded to its
+> server and deleted automatically, and the UI says so.)
 
 ## Features
 
@@ -114,6 +116,12 @@ cd frontend && npm run dev                                             # http://
 ```
 
 API docs: `http://localhost:8000/docs`.
+
+## Hosted demo
+
+The UI runs on Cloudflare, the API on Render (Docker, with LibreOffice for PDF),
+and per-visitor history in a Cloudflare D1 database. Setup and the manual Render
+steps are in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ## Tests
 

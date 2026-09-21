@@ -31,16 +31,20 @@ class WorkspaceManager:
     def delete(self, doc_id: str) -> None:
         shutil.rmtree(self._dir(doc_id), ignore_errors=True)
 
-    def sweep_expired(self, ttl_minutes: int) -> int:
+    def sweep_expired_ids(self, ttl_minutes: int) -> list[str]:
+        """Delete workspaces idle longer than the TTL; return the document ids removed."""
         cutoff = time.time() - ttl_minutes * 60
-        removed = 0
+        removed: list[str] = []
         if not self.root.exists():
-            return 0
+            return removed
         for child in self.root.iterdir():
             if child.is_dir() and child.stat().st_mtime < cutoff:
                 shutil.rmtree(child, ignore_errors=True)
-                removed += 1
+                removed.append(child.name)
         return removed
+
+    def sweep_expired(self, ttl_minutes: int) -> int:
+        return len(self.sweep_expired_ids(ttl_minutes))
 
     def _dir(self, doc_id: str) -> Path:
         safe = _SAFE_ID.sub("", doc_id)

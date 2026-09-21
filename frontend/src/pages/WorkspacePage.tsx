@@ -20,6 +20,7 @@ import { ErrorState, Spinner } from "../components/ui/Feedback";
 import { Tabs } from "../components/ui/Tabs";
 import { useToast } from "../components/ui/Toast";
 import { ApiError } from "../lib/api";
+import { COPY } from "../lib/deployment";
 import { stageForDocState, useFlowStage } from "../state/flowStage";
 import { useDocumentFlow } from "../state/useDocumentFlow";
 import { useWorkspace } from "../workspace/useWorkspace";
@@ -171,7 +172,7 @@ export function WorkspacePage() {
               <WhatChanged changeLog={ws.changeLog} preservation={ws.preservation} />
               {formatted ? (
                 <Card>
-                  <CardHeader title="Export" description="Verified files, generated locally." />
+                  <CardHeader title="Export" description={COPY.exports} />
                   <CardBody>
                     <ExportBar
                       docId={id}

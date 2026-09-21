@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -31,6 +32,15 @@ class Settings(BaseSettings):
 
     history_db: Path = Path("./.workspace/history.db")
     history_enabled: bool = True
+    # "sqlite" keeps history on local disk; "remote" uses the Cloudflare D1 history Worker.
+    history_backend: Literal["sqlite", "remote"] = "sqlite"
+    history_api_url: str = ""
+    history_api_token: str = ""
+    # On a shared server every visitor sends an anonymous X-Client-Id; history is then
+    # limited to that visitor. Off locally, where there is one user.
+    history_scope_by_owner: bool = False
+    # 0 = only sweep expired workspaces at startup (local default). >0 = also every N minutes.
+    workspace_sweep_interval_min: int = 0
 
     log_level: str = "INFO"
     log_format: str = "json"

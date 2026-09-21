@@ -1,0 +1,13 @@
+name = "manuscript-ai-history"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# The D1 database was created with `d1_database_create` (name: manuscript-ai-history).
+[[d1_databases]]
+binding = "DB"
+database_name = "manuscript-ai-history"
+database_id = "a7b1b84d-537e-4681-b2d0-b7adc828a2cf"
+
+# Secret (never committed): HISTORY_TOKEN
+#   wrangler secret put HISTORY_TOKEN
+# Local dev reads it from .dev.vars.

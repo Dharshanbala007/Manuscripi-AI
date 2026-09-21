@@ -1,0 +1,8 @@
+# Cloudflare hosting for the built UI (Workers static assets). Deploy: see docs/DEPLOYMENT.md.
+name = "manuscript-ai"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./dist"
+# Serve index.html for client-side routes such as /upload and /workspace/:id.
+not_found_handling = "single-page-application"

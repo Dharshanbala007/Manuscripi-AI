@@ -3,6 +3,7 @@ import { FileText, Lock, Moon, Sun } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { COPY } from "../../lib/deployment";
 import { FlowRail } from "./FlowRail";
 import { SilkBackground } from "./SilkBackground";
 
@@ -71,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3">
             <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
               <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-              Processed locally — your manuscript never leaves this machine
+              {COPY.privacyBadge}
             </span>
             <ThemeToggle theme={theme} toggle={toggleTheme} />
           </div>
@@ -82,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <footer className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
-        ManuScript AI · rule-based, offline-capable · IEEE and Springer format profiles
+        {COPY.footer}
       </footer>
     </div>
   );

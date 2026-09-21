@@ -1,0 +1,35 @@
+# Render Blueprint for the ManuScript AI API. See docs/DEPLOYMENT.md.
+# The UI is hosted on Cloudflare; history lives in a Cloudflare D1 database behind a small Worker.
+services:
+  - type: web
+    name: manuscript-ai-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_FORMAT
+        value: json
+      # Render's disk is ephemeral, so uploads live in /tmp and are swept while the service runs.
+      - key: WORK_DIR
+        value: /tmp/manuscript-workspace
+      - key: WORKSPACE_TTL_MIN
+        value: "30"
+      - key: WORKSPACE_SWEEP_INTERVAL_MIN
+        value: "10"
+      # Only the deployed UI may call the API from a browser.
+      - key: CORS_ORIGINS
+        value: '["https://manuscript-ai.dharshanbala007007.workers.dev"]'
+      # Shared server: keep each visitor's history separate, stored in Cloudflare D1.
+      - key: HISTORY_BACKEND
+        value: remote
+      - key: HISTORY_SCOPE_BY_OWNER
+        value: "true"
+      - key: HISTORY_API_URL
+        value: https://manuscript-ai-history.dharshanbala007007.workers.dev
+      # Secret: the same value set on the Worker with `wrangler secret put HISTORY_TOKEN`.
+      - key: HISTORY_API_TOKEN
+        sync: false

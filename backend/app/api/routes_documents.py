@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from app.analysis.comparison import build_comparison
 from app.analysis.corrections import apply_element, apply_metadata
 from app.analysis.pipeline import run_analysis
-from app.api.deps import get_history, get_settings_dep, get_store, get_workspaces
+from app.api.deps import get_history, get_owner, get_settings_dep, get_store, get_workspaces
 from app.api.errors import ApiError
 from app.config import Settings
 from app.domain.analysis import AnalysisProgress
@@ -40,14 +40,9 @@ from app.schemas.formatting import (
 from app.schemas.metadata import MetadataIn, MetadataOut
 from app.schemas.validation import HealthScoreOut, IssueOut, PreservationOut
 from app.storage.base import DocumentRecord, DocumentStore
-from app.storage.history import HistoryEntry, HistoryStore
+from app.storage.history import HistoryStore, record_history
 from app.storage.workspace import WorkspaceManager
 from app.utils.text import shorten
-
-
-def _record_history(history: HistoryStore, record: DocumentRecord) -> None:
-    history.upsert(HistoryEntry.from_record(record))
-
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -77,12 +72,13 @@ async def upload_document(
     store: DocumentStore = Depends(get_store),
     workspaces: WorkspaceManager = Depends(get_workspaces),
     history: HistoryStore = Depends(get_history),
+    owner: str = Depends(get_owner),
 ) -> DocumentOut:
     try:
-        record = await receive_upload(file, settings, store, workspaces)
+        record = await receive_upload(file, settings, store, workspaces, owner)
     except UploadValidationError as exc:
         raise ApiError(_STATUS_BY_CODE.get(exc.code, 400), exc.code, exc.message) from None
-    _record_history(history, record)
+    record_history(history, record)
     return DocumentOut.from_record(record)
 
 
@@ -212,7 +208,7 @@ def format_document_endpoint(
         raise ApiError(422, "profile_unavailable", message) from None
 
     store.update(record)
-    _record_history(history, record)
+    record_history(history, record)
     return FormatOut(
         state=record.state,
         profile_id=body.profile_id,
@@ -236,7 +232,7 @@ def validate_document_endpoint(
 
     issues, health, preservation = run_validate(record, workspaces)
     store.update(record)
-    _record_history(history, record)
+    record_history(history, record)
     return ValidateOut(
         state=record.state,
         issues=[IssueOut.from_domain(i) for i in issues],
@@ -284,7 +280,7 @@ def export_document_docx(
     record.artifacts["export_docx"] = out
     record.state = "exported"
     store.update(record)
-    _record_history(history, record)
+    record_history(history, record)
     return FileResponse(str(out), media_type=_DOCX_MEDIA, filename=out.name)
 
 
@@ -317,7 +313,7 @@ def export_document_pdf(
     record.page_count = result.page_count
     record.state = "exported"
     store.update(record)
-    _record_history(history, record)
+    record_history(history, record)
     return FileResponse(str(target), media_type="application/pdf", filename=target.name)
 
 

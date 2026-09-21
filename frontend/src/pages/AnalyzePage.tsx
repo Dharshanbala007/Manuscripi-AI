@@ -7,6 +7,7 @@ import { Button } from "../components/ui/Button";
 import { ErrorState } from "../components/ui/Feedback";
 import { usePolling } from "../hooks/usePolling";
 import { ApiError, api } from "../lib/api";
+import { COPY } from "../lib/deployment";
 import type { StatsOut } from "../lib/types";
 import { useDocumentFlow } from "../state/useDocumentFlow";
 
@@ -85,7 +86,7 @@ export function AnalyzePage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Analysing manuscript</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Reading the document and detecting its structure. This runs locally on your machine.
+          Reading the document and detecting its structure. {COPY.analyzing}
         </p>
       </div>
 

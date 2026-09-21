@@ -8,6 +8,7 @@ import { Badge } from "../components/ui/Badge";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
 import { FlowButton } from "../components/ui/FlowButton";
 import { api } from "../lib/api";
+import { COPY } from "../lib/deployment";
 import type { ProfileSummary } from "../lib/types";
 
 const STAGGER = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
@@ -28,7 +29,7 @@ export function DashboardPage() {
     <motion.div className="flex flex-col gap-8" variants={STAGGER} initial="hidden" animate="show">
       <motion.section variants={RISE} className="flex flex-col items-start gap-4">
         <Badge tone="accent">
-          <Sparkles className="h-3 w-3" /> Rule-based · offline-capable
+          <Sparkles className="h-3 w-3" /> {COPY.tag}
         </Badge>
         <h1 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tight text-foreground">
           Turn a raw manuscript into a{" "}
@@ -45,7 +46,7 @@ export function DashboardPage() {
           Upload an unformatted Word{" "}
           <code className="rounded bg-secondary px-1 text-foreground">.docx</code>. ManuScript AI
           analyses its structure, applies a publisher format profile, validates the result, and
-          exports a verified DOCX or PDF — all on this machine.
+          exports a verified DOCX or PDF{COPY.heroTail}
         </p>
         <FlowButton text="New manuscript" onClick={() => navigate("/upload")} className="mt-1" />
       </motion.section>
@@ -79,7 +80,7 @@ export function DashboardPage() {
           <CardBody className="flex flex-col gap-3 text-sm text-muted-foreground">
             <Step icon={FileText} text="Analyse — parse the document and classify every element with a confidence score." />
             <Step icon={ShieldCheck} text="Format & validate — apply the profile, then check structure, references, and layout." />
-            <Step icon={Lock} text="Private — processing runs locally; nothing is uploaded to any external service." />
+            <Step icon={Lock} text={COPY.privateStep} />
           </CardBody>
         </Card>
       </motion.div>
@@ -88,7 +89,7 @@ export function DashboardPage() {
         <Card>
           <CardHeader
             title="Recent manuscripts"
-            description="Local history — stored on this machine, no manuscript content."
+            description={COPY.historyNote}
           />
           <CardBody>
             <RecentList />

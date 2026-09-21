@@ -149,8 +149,8 @@ All suites pass on the final `master`-bound state of this branch:
 
 | Suite | Count | Result |
 |---|---|---|
-| Backend (pytest: unit + integration + API) | 137 tests | ✅ all passing |
-| Frontend (vitest: 7 test files) | 41 tests | ✅ all passing |
+| Backend (pytest: unit + integration + API) | 154 tests | ✅ all passing |
+| Frontend (vitest: 8 test files) | 46 tests | ✅ all passing |
 | End-to-end (Playwright, Chromium, 10 spec files) | 35 tests | ✅ all passing |
 | Linting / formatting | ruff, ruff-format, tsc | ✅ clean |
 

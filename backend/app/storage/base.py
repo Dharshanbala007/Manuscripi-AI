@@ -49,6 +49,8 @@ class DocumentRecord:
     page_count: int | None = None
     error: str | None = None
     error_id: str | None = None
+    # Anonymous per-browser id; only meaningful on a shared (hosted) server.
+    owner: str = ""
 
 
 class DocumentStore(ABC):

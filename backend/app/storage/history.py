@@ -2,14 +2,22 @@
 
 from __future__ import annotations
 
+import json
+import logging
 import sqlite3
+import urllib.error
+import urllib.request
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from contextlib import closing
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import quote, urlencode
 
 from app.storage.base import DocumentRecord
+
+logger = logging.getLogger("manuscript")
 
 _COUNT_FIELDS = ("words", "paragraphs", "headings", "tables", "figures", "references", "sections")
 _COLUMNS = (
@@ -23,7 +31,12 @@ _COLUMNS = (
     "health_total",
     "preservation_passed",
     *_COUNT_FIELDS,
+    "owner",
 )
+
+
+class HistoryError(Exception):
+    """A history backend could not be reached or rejected a request."""
 
 
 @dataclass
@@ -44,6 +57,8 @@ class HistoryEntry:
     figures: int = 0
     references: int = 0
     sections: int = 0
+    # Anonymous per-browser id, used only to scope the list on a shared (hosted) server.
+    owner: str = ""
 
     @classmethod
     def from_record(cls, record: DocumentRecord) -> HistoryEntry:
@@ -63,6 +78,7 @@ class HistoryEntry:
             profile_id=record.profile_id,
             health_total=record.health.total if record.health else None,
             preservation_passed=(record.preservation.passed if record.preservation else None),
+            owner=record.owner,
             **counts,
         )
 
@@ -71,7 +87,17 @@ def _iso(dt: datetime) -> str:
     return dt.astimezone(UTC).isoformat()
 
 
+def record_history(history: HistoryStore, record: DocumentRecord) -> None:
+    """Log a lifecycle step. A history outage must never fail the request that caused it."""
+    try:
+        history.upsert(HistoryEntry.from_record(record))
+    except HistoryError:
+        logger.warning("history_write_failed", exc_info=True)
+
+
 class HistoryStore(ABC):
+    """`owner=None` means "every row" (single-user/local); a string filters to that owner."""
+
     @abstractmethod
     def upsert(self, entry: HistoryEntry) -> None: ...
 
@@ -79,10 +105,10 @@ class HistoryStore(ABC):
     def get(self, entry_id: str) -> HistoryEntry | None: ...
 
     @abstractmethod
-    def list(self, limit: int = 20) -> list[HistoryEntry]: ...
+    def list(self, limit: int = 20, owner: str | None = None) -> list[HistoryEntry]: ...
 
     @abstractmethod
-    def delete(self, entry_id: str) -> None: ...
+    def delete(self, entry_id: str, owner: str | None = None) -> None: ...
 
 
 class InMemoryHistoryStore(HistoryStore):
@@ -95,14 +121,15 @@ class InMemoryHistoryStore(HistoryStore):
     def get(self, entry_id: str) -> HistoryEntry | None:
         return self._items.get(entry_id)
 
-    def list(self, limit: int = 20) -> list[HistoryEntry]:
-        rows = sorted(
-            self._items.values(), key=lambda e: (e.updated_at, e.created_at), reverse=True
-        )
+    def list(self, limit: int = 20, owner: str | None = None) -> list[HistoryEntry]:
+        rows = [e for e in self._items.values() if owner is None or e.owner == owner]
+        rows.sort(key=lambda e: (e.updated_at, e.created_at), reverse=True)
         return rows[: max(0, limit)]
 
-    def delete(self, entry_id: str) -> None:
-        self._items.pop(entry_id, None)
+    def delete(self, entry_id: str, owner: str | None = None) -> None:
+        entry = self._items.get(entry_id)
+        if entry is not None and (owner is None or entry.owner == owner):
+            del self._items[entry_id]
 
 
 _DDL = """
@@ -122,7 +149,8 @@ CREATE TABLE IF NOT EXISTS history (
     tables INTEGER NOT NULL DEFAULT 0,
     figures INTEGER NOT NULL DEFAULT 0,
     "references" INTEGER NOT NULL DEFAULT 0,
-    sections INTEGER NOT NULL DEFAULT 0
+    sections INTEGER NOT NULL DEFAULT 0,
+    owner TEXT NOT NULL DEFAULT ''
 );
 """
 
@@ -135,6 +163,13 @@ class SqliteHistoryStore(HistoryStore):
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._conn()) as conn, conn:
             conn.executescript(_DDL)
+            # Databases created before owner scoping existed lack the column.
+            existing = {row["name"] for row in conn.execute("PRAGMA table_info(history)")}
+            if "owner" not in existing:
+                conn.execute("ALTER TABLE history ADD COLUMN owner TEXT NOT NULL DEFAULT ''")
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_history_owner ON history(owner, updated_at)"
+            )
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self._path, timeout=5.0)
@@ -162,17 +197,19 @@ class SqliteHistoryStore(HistoryStore):
             row = conn.execute("SELECT * FROM history WHERE id = ?", (entry_id,)).fetchone()
         return _row_to_entry(row) if row else None
 
-    def list(self, limit: int = 20) -> list[HistoryEntry]:
+    def list(self, limit: int = 20, owner: str | None = None) -> list[HistoryEntry]:
+        where, args = ("", ()) if owner is None else ("WHERE owner = ? ", (owner,))
         with closing(self._conn()) as conn:
             rows = conn.execute(
-                "SELECT * FROM history ORDER BY updated_at DESC, created_at DESC LIMIT ?",
-                (max(0, limit),),
+                f"SELECT * FROM history {where}ORDER BY updated_at DESC, created_at DESC LIMIT ?",
+                (*args, max(0, limit)),
             ).fetchall()
         return [_row_to_entry(r) for r in rows]
 
-    def delete(self, entry_id: str) -> None:
+    def delete(self, entry_id: str, owner: str | None = None) -> None:
+        where, args = ("", ()) if owner is None else (" AND owner = ?", (owner,))
         with closing(self._conn()) as conn, conn:
-            conn.execute("DELETE FROM history WHERE id = ?", (entry_id,))
+            conn.execute(f"DELETE FROM history WHERE id = ?{where}", (entry_id, *args))
 
 
 def _row_to_entry(row: sqlite3.Row) -> HistoryEntry:
@@ -180,3 +217,99 @@ def _row_to_entry(row: sqlite3.Row) -> HistoryEntry:
     pp = data.get("preservation_passed")
     data["preservation_passed"] = None if pp is None else bool(pp)
     return HistoryEntry(**data)
+
+
+# (method, url, headers, body, timeout) -> (status, body)
+Transport = Callable[[str, str, dict[str, str], bytes | None, float], tuple[int, bytes]]
+
+
+def _urllib_transport(
+    method: str, url: str, headers: dict[str, str], body: bytes | None, timeout: float
+) -> tuple[int, bytes]:
+    request = urllib.request.Request(url, data=body, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return response.status, response.read()
+    except urllib.error.HTTPError as err:
+        return err.code, err.read()
+    except (urllib.error.URLError, TimeoutError, OSError) as err:
+        raise HistoryError(f"history service unreachable: {err}") from err
+
+
+class RemoteHistoryStore(HistoryStore):
+    """History kept in a Cloudflare D1 database behind a small authenticated Worker.
+
+    A hosted backend (e.g. on Render) has no durable disk, so history lives off-box. The
+    Worker (`cloudflare/history-worker`) owns the SQL; this class only speaks its JSON API.
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        token: str,
+        *,
+        transport: Transport = _urllib_transport,
+        timeout: float = 8.0,
+    ) -> None:
+        self._base = base_url.rstrip("/")
+        self._token = token
+        self._transport = transport
+        self._timeout = timeout
+
+    def _call(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, str | int] | None = None,
+        body: dict | None = None,
+    ) -> tuple[int, bytes]:
+        url = self._base + path + (f"?{urlencode(params)}" if params else "")
+        headers = {
+            "authorization": f"Bearer {self._token}",
+            "accept": "application/json",
+            # Cloudflare's bot rules reject the default Python-urllib agent.
+            "user-agent": "manuscript-ai-backend/1.0",
+        }
+        data = None
+        if body is not None:
+            data = json.dumps(body).encode()
+            headers["content-type"] = "application/json"
+        return self._transport(method, url, headers, data, self._timeout)
+
+    def upsert(self, entry: HistoryEntry) -> None:
+        status, raw = self._call("PUT", f"/entries/{quote(entry.id, safe='')}", body=asdict(entry))
+        if status >= 300:
+            raise HistoryError(f"history upsert failed: HTTP {status} {raw[:120]!r}")
+
+    def get(self, entry_id: str) -> HistoryEntry | None:
+        status, raw = self._call("GET", f"/entries/{quote(entry_id, safe='')}")
+        if status == 404:
+            return None
+        if status >= 300:
+            raise HistoryError(f"history get failed: HTTP {status}")
+        return _entry_from_json(json.loads(raw))
+
+    def list(self, limit: int = 20, owner: str | None = None) -> list[HistoryEntry]:
+        params: dict[str, str | int] = {"limit": max(0, limit)}
+        if owner is not None:
+            params["owner"] = owner
+        status, raw = self._call("GET", "/entries", params=params)
+        if status >= 300:
+            raise HistoryError(f"history list failed: HTTP {status}")
+        return [_entry_from_json(item) for item in json.loads(raw)]
+
+    def delete(self, entry_id: str, owner: str | None = None) -> None:
+        params = None if owner is None else {"owner": owner}
+        status, _ = self._call("DELETE", f"/entries/{quote(entry_id, safe='')}", params=params)
+        if status >= 300 and status != 404:
+            raise HistoryError(f"history delete failed: HTTP {status}")
+
+
+_ENTRY_FIELDS = {f.name for f in fields(HistoryEntry)}
+
+
+def _entry_from_json(data: dict) -> HistoryEntry:
+    entry = {k: v for k, v in data.items() if k in _ENTRY_FIELDS}
+    pp = entry.get("preservation_passed")
+    entry["preservation_passed"] = None if pp is None else bool(pp)
+    return HistoryEntry(**entry)

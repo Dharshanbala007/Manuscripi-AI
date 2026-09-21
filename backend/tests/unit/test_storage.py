@@ -55,3 +55,13 @@ def test_workspace_sweep_expired(tmp_path):
     assert removed == 1
     assert fresh.is_dir()
     assert not old.exists()
+
+
+def test_workspace_sweep_expired_ids_names_the_removed_documents(tmp_path):
+    wm = WorkspaceManager(tmp_path / "ws")
+    wm.create("keepkeep")
+    old = wm.create("dropdrop")
+    past = time.time() - 3 * 3600
+    os.utime(old, (past, past))
+
+    assert wm.sweep_expired_ids(ttl_minutes=120) == ["dropdrop"]

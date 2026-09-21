@@ -14,10 +14,16 @@ import type {
   ProfileSummary,
   ValidateOut,
 } from "./types";
+import { HOSTED, clientId } from "./deployment";
 
 export const API_BASE: string =
   (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "") ??
   "http://localhost:8000";
+
+const withClientId = (init?: RequestInit): RequestInit => ({
+  ...init,
+  headers: { ...(init?.headers as Record<string, string> | undefined), "x-client-id": clientId() },
+});
 
 export class ApiError extends Error {
   constructor(
@@ -34,7 +40,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}${path}`, init);
+    res = await fetch(`${API_BASE}${path}`, HOSTED ? withClientId(init) : init);
   } catch {
     throw new ApiError(0, "network_error", "Could not reach the ManuScript AI backend.");
   }

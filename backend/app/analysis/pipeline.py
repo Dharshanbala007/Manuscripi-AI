@@ -19,7 +19,7 @@ from app.extraction.metadata import extract_metadata
 from app.logging_config import log_stage, logger
 from app.parsing.docx_reader import DocxReadError, parse_docx
 from app.storage.base import DocumentStore
-from app.storage.history import HistoryEntry, HistoryStore
+from app.storage.history import HistoryStore, record_history
 from app.utils.ids import short_id
 from app.utils.text import shorten
 
@@ -61,7 +61,7 @@ def run_analysis(
         )
     finally:
         store.update(record)
-        history.upsert(HistoryEntry.from_record(record))
+        record_history(history, record)
         log_stage(
             "analyze_done",
             document_id=doc_id,

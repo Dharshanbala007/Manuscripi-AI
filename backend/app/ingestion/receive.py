@@ -19,6 +19,7 @@ async def receive_upload(
     settings: Settings,
     store: DocumentStore,
     workspaces: WorkspaceManager,
+    owner: str = "",
 ) -> DocumentRecord:
     original_name = upload.filename or "manuscript.docx"
     if not original_name.lower().endswith(".docx"):
@@ -39,6 +40,7 @@ async def receive_upload(
         size=len(data),
         state="uploaded",
         source_path=source_path,
+        owner=owner,
     )
     store.create(record)
     log_stage("upload", document_id=doc_id, bytes=len(data))

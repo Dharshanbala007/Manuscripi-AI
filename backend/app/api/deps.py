@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from fastapi import Request
 
 from app.config import Settings
@@ -24,3 +26,12 @@ def get_workspaces(request: Request) -> WorkspaceManager:
 
 def get_history(request: Request) -> HistoryStore:
     return request.app.state.history
+
+
+_CLIENT_ID = re.compile(r"[A-Za-z0-9_-]{16,64}")
+
+
+def get_owner(request: Request) -> str:
+    """The caller's anonymous id from `X-Client-Id`, or "" if absent/malformed."""
+    value = request.headers.get("x-client-id", "")
+    return value if _CLIENT_ID.fullmatch(value) else ""
