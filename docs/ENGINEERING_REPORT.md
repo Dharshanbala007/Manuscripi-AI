@@ -151,7 +151,7 @@ All suites pass on the final `master`-bound state of this branch:
 |---|---|---|
 | Backend (pytest: unit + integration + API) | 137 tests | ✅ all passing |
 | Frontend (vitest: 7 test files) | 41 tests | ✅ all passing |
-| End-to-end (Playwright, Chromium, 10 spec files) | 34 tests | ✅ all passing |
+| End-to-end (Playwright, Chromium, 10 spec files) | 35 tests | ✅ all passing |
 | Linting / formatting | ruff, ruff-format, tsc | ✅ clean |
 
 `bash scripts/check.sh` runs all of the above in one command and is the
@@ -173,7 +173,7 @@ QA checklist:
 | `export.spec.ts` | Real DOCX download; PDF download (or the documented unavailable state, decided at runtime from `/api/health`). |
 | `resilience.spec.ts` | Reload mid-workflow, ended-session recovery, simulated backend outage, mobile-viewport layout. |
 | `a11y.spec.ts` | Automated axe scans on every major screen/tab, keyboard-only upload, dialog focus containment. |
-| `theme.spec.ts` | Dark by default with the silk canvas animating (pixel fingerprint changes between frames); a single still frame under reduced motion; the header toggle switches to light, removes the silk, and persists across reloads; the light theme passes axe; the flow button opens the upload screen. |
+| `theme.spec.ts` | Dark by default with the silk canvas animating (pixel fingerprint changes between frames); a single still frame under reduced motion; the header toggle switches to a lighter, still-flowing silk and persists across reloads; both silks hold a still frame under reduced motion; the light theme passes axe; the flow button opens the upload screen. |
 | `morph.spec.ts` | The morphing UI: flow rail advances with no console errors; the shared glass surface and the format dialog animate through intermediate frames (measured per animation frame); action buttons pass through pending/success; reduced motion disables the surface animation. |
 
 **One real bug was found and fixed via the mandated reproduce → understand →

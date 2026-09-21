@@ -59,8 +59,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-col font-sans">
-      {theme === "dark" ? <SilkBackground /> : null}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl dark:backdrop-blur-md">
+      <SilkBackground theme={theme} />
+      <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
             <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-primary to-violet-500 text-white shadow-glow">

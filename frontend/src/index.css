@@ -23,10 +23,6 @@
     --input: 240 6% 84%;
     --ring: 243 75% 59%;
     --radius: 0.75rem;
-    --aurora:
-      radial-gradient(52rem 36rem at 6% -8%, hsl(243 95% 80% / 0.6), transparent 64%),
-      radial-gradient(46rem 34rem at 98% 4%, hsl(199 95% 76% / 0.5), transparent 60%),
-      radial-gradient(44rem 30rem at 55% 108%, hsl(283 90% 82% / 0.45), transparent 64%);
   }
 
   [data-theme="dark"] {
@@ -48,8 +44,6 @@
     --border: 240 14% 20%;
     --input: 240 14% 24%;
     --ring: 243 88% 64%;
-    /* the animated silk canvas (SilkBackground) is the dark-theme backdrop */
-    --aurora: none;
   }
 
   * {
@@ -66,20 +60,6 @@
     @apply bg-background text-foreground antialiased transition-colors duration-300;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-
-  /* Aurora mesh lives on a fixed pseudo-element so the body keeps a solid colour
-     (axe computes contrast against it) while the page still gets depth. Each theme
-     defines its own --aurora gradient stack above. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: -10%;
-    z-index: -1;
-    pointer-events: none;
-    background: var(--aurora);
-    animation: aurora 22s ease-in-out infinite;
-    transition: background 300ms ease;
-  }
 }
 
 @layer utilities {
@@ -87,9 +67,8 @@
     @apply outline-none ring-2 ring-primary/40 ring-offset-2 ring-offset-background;
   }
   .glass {
-    @apply border border-white/70 bg-white/70 shadow-glass backdrop-blur-xl;
-    /* smaller blur in dark: every re-blur repaints when the silk moves, and the silk is soft anyway */
-    @apply dark:border-white/10 dark:bg-white/[0.06] dark:shadow-glass-dark dark:backdrop-blur-md;
+    @apply border border-white/70 bg-white/70 shadow-glass backdrop-blur-md;
+    @apply dark:border-white/10 dark:bg-white/[0.06] dark:shadow-glass-dark;
   }
 }
 

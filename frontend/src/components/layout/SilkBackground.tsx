@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 // driven by elapsed ms (so speed is constant at any update rate) and adaptive: the frosted
 // glass on top re-blurs whenever the canvas changes, so if the page's own frame rate sags the
 // canvas updates less often, down to a slow drift, rather than making the UI stutter; a single static frame under
-// prefers-reduced-motion; darker violet tint so text on the glass keeps AA contrast; the
+// prefers-reduced-motion; a per-theme colour ramp (deep violet / pale lavender) so text on the glass keeps AA contrast; the
 // vignette moved to CSS instead of a per-frame canvas gradient.
 const MAX_SCALE = 0.25;
 const TARGET_WIDTH = 320;
@@ -15,15 +15,34 @@ const FLOOR_FRAME_MS = 1000 / 8;
 const SPEED = 0.02;
 const TEX_SCALE = 2;
 const NOISE = 0.8;
-const TINT = [104, 92, 168] as const;
-const GAIN = 0.5;
+
+export type SilkTheme = "dark" | "light";
+
+// `lo` is the colour where the pattern is faint, `hi` where a ribbon catches the light.
+// Dark stays deep violet and light stays pale lavender so text on the glass keeps AA contrast.
+const PALETTE = {
+  dark: {
+    lo: [0, 0, 0],
+    hi: [52, 46, 84],
+    veil:
+      "radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(4,4,10,0.35) 60%, rgba(4,4,10,0.75) 100%)," +
+      "linear-gradient(to bottom, rgba(0,0,0,0.25), transparent 35%, rgba(0,0,0,0.45))",
+  },
+  light: {
+    lo: [212, 207, 245],
+    hi: [251, 250, 255],
+    veil:
+      "radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(255,255,255,0.25) 60%, rgba(255,255,255,0.5) 100%)," +
+      "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent 35%, rgba(255,255,255,0.25))",
+  },
+} as const;
 
 function noise(x: number, y: number): number {
   const G = 2.71828;
   return (G * Math.sin(G * x) * G * Math.sin(G * y) * (1 + x)) % 1;
 }
 
-export function SilkBackground() {
+export function SilkBackground({ theme }: { theme: SilkTheme }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -31,6 +50,7 @@ export function SilkBackground() {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
+    const { lo, hi } = PALETTE[theme];
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let w = 0;
     let h = 0;
@@ -58,11 +78,11 @@ export function SilkBackground() {
                 5 * (u + ty + Math.cos(3 * u + 5 * ty) + 0.02 * off) +
                   Math.sin(20 * (u + ty - 0.1 * off)),
               );
-          const k = Math.max(0, p - grain[y * w + x]) * GAIN;
+          const k = Math.max(0, p - grain[y * w + x]);
           const i = (y * w + x) * 4;
-          data[i] = TINT[0] * k;
-          data[i + 1] = TINT[1] * k;
-          data[i + 2] = TINT[2] * k;
+          data[i] = lo[0] + (hi[0] - lo[0]) * k;
+          data[i + 1] = lo[1] + (hi[1] - lo[1]) * k;
+          data[i + 2] = lo[2] + (hi[2] - lo[2]) * k;
           data[i + 3] = 255;
         }
       }
@@ -112,18 +132,14 @@ export function SilkBackground() {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div aria-hidden="true" data-testid="silk-background" className="pointer-events-none fixed inset-0 -z-10">
       <canvas ref={ref} className="h-full w-full" />
       <div
         className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(4,4,10,0.35) 60%, rgba(4,4,10,0.75) 100%)," +
-            "linear-gradient(to bottom, rgba(0,0,0,0.25), transparent 35%, rgba(0,0,0,0.45))",
-        }}
+        style={{ background: PALETTE[theme].veil }}
       />
     </div>
   );

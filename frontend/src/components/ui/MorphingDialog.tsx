@@ -173,7 +173,7 @@ export function MorphingDialogContent({
       style={{ borderRadius: radius }}
       className={cn(
         "pointer-events-auto relative w-full overflow-hidden outline-none",
-        "glass shadow-[0_30px_80px_-20px_rgba(49,46,129,0.35)] backdrop-blur-2xl dark:backdrop-blur-md",
+        "glass shadow-[0_30px_80px_-20px_rgba(49,46,129,0.35)] backdrop-blur-md",
         className,
       )}
     >

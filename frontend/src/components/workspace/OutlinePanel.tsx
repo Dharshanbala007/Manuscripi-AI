@@ -11,7 +11,7 @@ export function OutlinePanel({
 }) {
   return (
     <nav aria-label="Document outline" className="text-sm">
-      <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
         Outline
       </p>
       {nodes.length === 0 ? (

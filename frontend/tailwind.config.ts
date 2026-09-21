@@ -37,13 +37,6 @@ export default {
           "0 1px 0 rgba(255,255,255,0.07) inset, 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px -20px rgba(129,105,255,0.45)",
         glow: "0 10px 30px -10px rgba(79,70,229,0.55)",
       },
-      keyframes: {
-        aurora: {
-          "0%, 100%": { transform: "translate3d(0,0,0) scale(1)" },
-          "50%": { transform: "translate3d(-2%,1.5%,0) scale(1.06)" },
-        },
-      },
-      animation: { aurora: "aurora 22s ease-in-out infinite" },
     },
   },
   plugins: [animate],
