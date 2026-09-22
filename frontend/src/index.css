@@ -76,6 +76,21 @@
   @apply focus-ring rounded-[6px];
 }
 
+@keyframes rotate-gradient {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes border-beam-rotation {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

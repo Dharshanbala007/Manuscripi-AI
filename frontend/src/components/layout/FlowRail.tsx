@@ -14,7 +14,8 @@ function currentStep(pathname: string, workspaceStage: number | null): number | 
   return null;
 }
 
-// A persistent progress rail: the filled pill slides between steps as the flow advances.
+// A persistent progress rail: the active step gets the same glass-pill "lamp" treatment
+// as GlassNavBar's tabs, so the header nav and this rail read as one system.
 export function FlowRail() {
   const { pathname } = useLocation();
   const { workspaceStage } = useFlowStage();
@@ -22,8 +23,11 @@ export function FlowRail() {
   if (current === null) return null;
 
   return (
-    <nav aria-label="Manuscript progress" className="glass mx-auto mb-6 max-w-2xl rounded-full p-1.5">
-      <ol className="flex items-center">
+    <nav
+      aria-label="Manuscript progress"
+      className="mx-auto mb-6 flex max-w-2xl items-center gap-1 rounded-full border border-border bg-background/40 p-1.5 shadow-glass backdrop-blur-xl dark:shadow-glass-dark"
+    >
+      <ol className="flex flex-1 items-center">
         {STEPS.map((label, i) => {
           const state = i < current ? "done" : i === current ? "active" : "todo";
           return (
@@ -34,28 +38,31 @@ export function FlowRail() {
             >
               {state === "active" ? (
                 <motion.span
-                  layoutId="flow-rail-pill"
+                  layoutId="flow-rail-lamp"
                   aria-hidden="true"
-                  className="absolute inset-0 bg-primary shadow-glow"
-                  style={{ borderRadius: 9999 }}
+                  className="absolute inset-0 -z-10 rounded-full bg-primary/10"
                   transition={SLIDE}
-                />
+                >
+                  <span className="absolute -top-1.5 left-1/2 h-1 w-6 -translate-x-1/2 rounded-t-full bg-primary">
+                    <span className="absolute -left-3 -top-2.5 h-6 w-12 rounded-full bg-primary/30 blur-md" />
+                  </span>
+                </motion.span>
               ) : null}
               <span
                 className={cn(
                   "relative z-10 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-colors sm:px-3",
-                  state === "active" && "text-white",
+                  state === "active" && "text-primary",
                   state === "done" && "text-emerald-700 dark:text-emerald-400",
-                  state === "todo" && "text-zinc-600 dark:text-zinc-400",
+                  state === "todo" && "text-muted-foreground",
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
                     "grid h-4 w-4 place-items-center rounded-full text-[10px] tabular-nums",
-                    state === "active" && "bg-white/25",
+                    state === "active" && "bg-primary/15",
                     state === "done" && "bg-emerald-100 dark:bg-emerald-500/20",
-                    state === "todo" && "bg-zinc-200/70 dark:bg-white/10",
+                    state === "todo" && "bg-secondary",
                   )}
                 >
                   {state === "done" ? <Check className="h-2.5 w-2.5" /> : i + 1}

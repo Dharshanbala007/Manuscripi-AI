@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { RecentList } from "../components/dashboard/RecentList";
 import { Badge } from "../components/ui/Badge";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
-import { FlowButton } from "../components/ui/FlowButton";
+import { GlassCta } from "../components/ui/GlassCta";
 import { api } from "../lib/api";
 import { COPY } from "../lib/deployment";
 import type { ProfileSummary } from "../lib/types";
@@ -48,7 +48,7 @@ export function DashboardPage() {
           analyses its structure, applies a publisher format profile, validates the result, and
           exports a verified DOCX or PDF{COPY.heroTail}
         </p>
-        <FlowButton text="New manuscript" onClick={() => navigate("/upload")} className="mt-1" />
+        <GlassCta text="New manuscript" onClick={() => navigate("/upload")} className="mt-1" />
       </motion.section>
 
       <motion.div variants={RISE} className="grid gap-5 md:grid-cols-2">
