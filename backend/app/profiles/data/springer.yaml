@@ -153,10 +153,11 @@ captions:
 
 tables:
   provenance: configurable
-  note: Grid style with a bold header row; oversize tables are flagged, never shrunk.
+  note: Grid style with a bold header row; a table wider than the column is scaled
+    down to fit (columns keep their proportions, text just wraps). Tables with too
+    many columns to stay readable at that width are flagged instead.
   style_name: Table Grid
   header_bold: true
-  max_width_action: flag
 
 figures:
   provenance: configurable

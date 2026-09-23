@@ -26,6 +26,17 @@ def apply_page_layout(doc, profile: PublisherProfile) -> None:
         _set_columns(section, profile.columns.count, profile.columns.spacing_in)
 
 
+def available_column_width_emu(profile: PublisherProfile) -> int:
+    """The printable width of one column, in EMU -- what a table must fit inside once
+    apply_page_layout has run. Used to shrink tables that would otherwise overflow a
+    narrow multi-column layout (see app.formatting.tables)."""
+    width, _ = _PAGE_SIZES.get(profile.page.size, _PAGE_SIZES["letter"])
+    usable = width - Inches(profile.page.margin_left_in) - Inches(profile.page.margin_right_in)
+    count = max(1, profile.columns.count)
+    gutters = Inches(profile.columns.spacing_in) * (count - 1)
+    return int((usable - gutters) / count)
+
+
 def _set_columns(section, count: int, spacing_in: float) -> None:
     sectPr = section._sectPr
     cols = sectPr.find(qn("w:cols"))

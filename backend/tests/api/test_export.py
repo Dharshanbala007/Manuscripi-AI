@@ -64,6 +64,26 @@ def test_export_before_format_is_409(analyzed_doc):
     assert client.get(f"/api/documents/{doc_id}/export/docx").status_code == 409
 
 
+def test_preview_falls_back_to_structured_html_on_an_unexpected_pdf_failure(
+    analyzed_doc, monkeypatch
+):
+    """A crash or timeout in the PDF converter must never surface as a blank/500 iframe."""
+    import app.api.routes_documents as routes
+
+    def _boom(*args, **kwargs):
+        raise RuntimeError("simulated LibreOffice crash")
+
+    monkeypatch.setattr(routes, "pdf_available", lambda settings: True)
+    monkeypatch.setattr(routes, "export_pdf", _boom)
+
+    client, doc_id = _formatted(analyzed_doc)
+    resp = client.get(f"/api/documents/{doc_id}/preview")
+
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers["content-type"]
+    assert "Structural preview" in resp.text
+
+
 def test_delete_removes_the_document(client):
     doc_id = client.post(
         "/api/documents/upload",

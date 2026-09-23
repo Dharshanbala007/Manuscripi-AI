@@ -162,7 +162,9 @@ See `docs/RULES.md` for every rule's provenance in both profiles.
 - Heading auto-numbering (e.g. `I.`, `A.`) and run-in level-3 headings are
   **not** injected by the engine — only typography, alignment, spacing, and an
   optional upper-case transform are applied.
-- Oversize tables and figures are **flagged**, never resized.
+- A table wider than its column is scaled down to fit (columns keep their proportions;
+  text wraps, nothing is cropped). Figures, and tables with too many columns to stay
+  readable at that width, are **flagged**, never resized.
 - Equations, footnotes, hyperlinks, and field codes are preserved as-is, not
   reformatted.
 - The `DocumentStore` is in-process: a document's live working session is lost when

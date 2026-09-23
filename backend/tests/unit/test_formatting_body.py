@@ -1,9 +1,12 @@
+import pytest
 from docx import Document
+from docx.shared import Inches
 from docx.table import Table
 
 from app.formatting.body import restyle_body
 from app.formatting.figures import check_figures
 from app.formatting.frontmatter import rebuild_frontmatter
+from app.formatting.page import available_column_width_emu
 from app.formatting.styles import ensure_styles
 from app.formatting.tables import style_tables
 from app.parsing.ooxml import iter_block_items
@@ -71,6 +74,43 @@ def test_style_tables_flags_wide_table(tmp_path):
     doc = Document(str(path))
     issues = style_tables(doc, ms, PROFILE)
     assert any("column" in i.message.lower() for i in issues)
+
+
+def test_style_tables_shrinks_a_wide_table_to_fit_the_column(tmp_path):
+    builder = Document()
+    table = builder.add_table(rows=1, cols=3)
+    for col, width in zip(table.columns, [Inches(3), Inches(2), Inches(1)], strict=True):
+        col.width = width  # 6in total, well over IEEE's ~3.5in column
+    path = tmp_path / "in.docx"
+    builder.save(str(path))
+
+    ms = manuscript_from(path)
+    doc = Document(str(path))
+    style_tables(doc, ms, PROFILE)
+
+    avail = available_column_width_emu(PROFILE)
+    resized = list(doc.tables[0].columns)
+    total = sum(int(c.width) for c in resized)
+    assert total <= avail
+    assert total > avail * 0.99  # scaled to fill the column, not shrunk further than needed
+    ratio = int(resized[0].width) / int(resized[1].width)
+    assert ratio == pytest.approx(3 / 2, rel=1e-3)  # proportions preserved
+
+
+def test_style_tables_leaves_a_narrow_table_untouched(tmp_path):
+    builder = Document()
+    table = builder.add_table(rows=1, cols=2)
+    widths = [Inches(0.75), Inches(0.75)]
+    for col, width in zip(table.columns, widths, strict=True):
+        col.width = width  # 1.5in total, already well under the column
+    path = tmp_path / "in.docx"
+    builder.save(str(path))
+
+    ms = manuscript_from(path)
+    doc = Document(str(path))
+    style_tables(doc, ms, PROFILE)
+
+    assert [int(c.width) for c in doc.tables[0].columns] == [int(w) for w in widths]
 
 
 def test_check_figures_flags_missing_caption(tmp_path):

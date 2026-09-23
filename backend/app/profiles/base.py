@@ -119,7 +119,6 @@ class CaptionRules(RuleGroup):
 class TableRules(RuleGroup):
     style_name: str = "Table Grid"
     header_bold: bool = True
-    max_width_action: str = "flag"  # v1: flag only, never shrink destructively
 
 
 class FigureRules(RuleGroup):

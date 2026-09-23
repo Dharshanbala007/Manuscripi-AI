@@ -21,6 +21,7 @@ from app.export.preview import render_structured_html
 from app.formatting.run import ProfileUnavailable, run_format, run_validate
 from app.ingestion.receive import receive_upload
 from app.ingestion.validate_upload import UploadValidationError
+from app.logging_config import logger
 from app.schemas.analysis import (
     AnalysisOut,
     ElementOut,
@@ -340,6 +341,9 @@ def preview_document(
             return FileResponse(str(cached), media_type="application/pdf")
         except PdfExportError:
             pass  # fall through to the structured preview
+        except Exception:  # noqa: BLE001 - preview must fail soft, never a blank/500 iframe
+            record.artifacts.pop("preview_pdf", None)
+            logger.exception("preview_pdf_failed", extra={"extra_fields": {"document_id": doc_id}})
 
     label = (record.profile_id or "ieee").upper()
     return HTMLResponse(content=render_structured_html(record.manuscript, label))
